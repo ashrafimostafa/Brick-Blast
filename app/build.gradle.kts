@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.brickblast"
+    namespace = "com.mostafa.brickblast"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.brickblast"
+        applicationId = "com.mostafa.brickblast"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -28,6 +28,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+
+    // F-Droid / reproducible builds: strip the Google-signed dependency metadata
+    // block that gets embedded in the APK/bundle (proprietary, breaks repro builds).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 
     compileOptions {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.brickblast"
+    package="com.mostafa.brickblast"
     android:versionCode="1"
     android:versionName="1.0.0" >
 
@@ -9,13 +9,13 @@
         android:targetSdkVersion="35" />
 
     <permission
-        android:name="com.example.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:name="com.mostafa.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.example.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.mostafa.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
-        android:name="com.example.brickblast.BrickBlastApplication"
+        android:name="com.mostafa.brickblast.BrickBlastApplication"
         android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
@@ -28,7 +28,7 @@
         android:theme="@style/Theme.BrickBlast" >
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.brickblast.fileprovider"
+            android:authorities="com.mostafa.brickblast.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true" >
             <meta-data
@@ -37,7 +37,7 @@
         </provider>
 
         <activity
-            android:name="com.example.brickblast.MainActivity"
+            android:name="com.mostafa.brickblast.MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -57,7 +57,7 @@
 
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.example.brickblast.androidx-startup"
+            android:authorities="com.mostafa.brickblast.androidx-startup"
             android:exported="false" >
             <meta-data
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"

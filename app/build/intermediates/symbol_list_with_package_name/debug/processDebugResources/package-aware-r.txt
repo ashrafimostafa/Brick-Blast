@@ -1,4 +1,4 @@
-com.example.brickblast
+com.mostafa.brickblast
 anim fragment_fast_out_extra_slow_in
 animator fragment_close_enter
 animator fragment_close_exit

@@ -1,44 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.brickblast.app-mergeDebugResources-2:/values-fi/values-fi.xml",
+            "outputFile": "com.mostafa.brickblast.app-mergeDebugResources-64:/values-fi/values-fi.xml",
             "map": [
                 {
-                    "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/caches/8.9/transforms/a2ef29a12fac42d17f59aa94ada6d564/transformed/foundation-release/res/values-fi/values-fi.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,145",
-                        "endColumns": "89,89",
-                        "endOffsets": "140,230"
-                    },
-                    "to": {
-                        "startLines": "85,86",
-                        "startColumns": "4,4",
-                        "startOffsets": "8748,8838",
-                        "endColumns": "89,89",
-                        "endOffsets": "8833,8923"
-                    }
-                },
-                {
-                    "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/res/values-fi/values-fi.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,151,253,351,456,561,673,789",
-                        "endColumns": "95,101,97,104,104,111,115,100",
-                        "endOffsets": "146,248,346,451,556,668,784,885"
-                    },
-                    "to": {
-                        "startLines": "2,3,4,5,6,7,8,81",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,201,303,401,506,611,723,8376",
-                        "endColumns": "95,101,97,104,104,111,115,100",
-                        "endOffsets": "196,298,396,501,606,718,834,8472"
-                    }
-                },
-                {
-                    "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/caches/8.9/transforms/47730fd0e54e53cd481a80f3094fc6e5/transformed/material3-release/res/values-fi/values-fi.xml",
+                    "source": "/home/mostafa/.gradle/caches/8.9/transforms/47730fd0e54e53cd481a80f3094fc6e5/transformed/material3-release/res/values-fi/values-fi.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,7 +21,41 @@
                     }
                 },
                 {
-                    "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/caches/8.9/transforms/be3b9353648502bd776119866a06ea43/transformed/ui-release/res/values-fi/values-fi.xml",
+                    "source": "/home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/res/values-fi/values-fi.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,151,253,351,456,561,673,789",
+                        "endColumns": "95,101,97,104,104,111,115,100",
+                        "endOffsets": "146,248,346,451,556,668,784,885"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,81",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,201,303,401,506,611,723,8376",
+                        "endColumns": "95,101,97,104,104,111,115,100",
+                        "endOffsets": "196,298,396,501,606,718,834,8472"
+                    }
+                },
+                {
+                    "source": "/home/mostafa/.gradle/caches/8.9/transforms/a2ef29a12fac42d17f59aa94ada6d564/transformed/foundation-release/res/values-fi/values-fi.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,145",
+                        "endColumns": "89,89",
+                        "endOffsets": "140,230"
+                    },
+                    "to": {
+                        "startLines": "85,86",
+                        "startColumns": "4,4",
+                        "startOffsets": "8748,8838",
+                        "endColumns": "89,89",
+                        "endOffsets": "8833,8923"
+                    }
+                },
+                {
+                    "source": "/home/mostafa/.gradle/caches/8.9/transforms/be3b9353648502bd776119866a06ea43/transformed/ui-release/res/values-fi/values-fi.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

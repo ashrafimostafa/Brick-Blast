@@ -1,18 +1,18 @@
 [
     {
-        "merged": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/daemon/8.9/com.example.brickblast.app-debug-4:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/daemon/8.9/com.example.brickblast.app-main-6:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.mostafa.brickblast.app-debug-66:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.mostafa.brickblast.app-main-68:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/daemon/8.9/com.example.brickblast.app-debug-4:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/daemon/8.9/com.example.brickblast.app-main-6:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.mostafa.brickblast.app-debug-66:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.mostafa.brickblast.app-main-68:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.example.brickblast.app-debug-4:/xml_file_paths.xml.flat",
-        "source": "com.example.brickblast.app-main-6:/xml/file_paths.xml"
+        "merged": "com.mostafa.brickblast.app-debug-66:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.mostafa.brickblast.app-main-68:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/daemon/8.9/com.example.brickblast.app-debug-4:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/daemon/8.9/com.example.brickblast.app-main-6:/drawable/ic_launcher_foreground.xml"
+        "merged": "com.mostafa.brickblast.app-debug-66:/xml_file_paths.xml.flat",
+        "source": "com.mostafa.brickblast.app-main-68:/xml/file_paths.xml"
     }
 ]

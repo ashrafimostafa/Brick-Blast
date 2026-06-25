@@ -1,0 +1,7 @@
+First release of Brick Blast.
+
+* Turn-based brick breaker with custom physics
+* Classic, Challenge, Time Attack and Hardcore modes
+* Power-ups, collectables and particle effects
+* Light/dark theme with animated switch
+* High scores, statistics and score sharing

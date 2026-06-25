@@ -133,7 +133,7 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/mosta
 		ADDED from /home/mostafa/AndroidStudioProjects/SwipeBrickBreaker/app/src/main/AndroidManifest.xml:11:9-48
 	android:name
 		ADDED from /home/mostafa/AndroidStudioProjects/SwipeBrickBreaker/app/src/main/AndroidManifest.xml:5:9-46
-activity#com.example.brickblast.MainActivity
+activity#com.mostafa.brickblast.MainActivity
 ADDED from /home/mostafa/AndroidStudioProjects/SwipeBrickBreaker/app/src/main/AndroidManifest.xml:23:9-33:20
 	android:screenOrientation
 		ADDED from /home/mostafa/AndroidStudioProjects/SwipeBrickBreaker/app/src/main/AndroidManifest.xml:27:13-49
@@ -357,7 +357,7 @@ ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transfor
 		ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
 	android:name
 		ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:23:9-81
-permission#com.example.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+permission#com.mostafa.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:22:5-24:47
 	android:protectionLevel
 		ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
@@ -367,7 +367,7 @@ uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:26:22-94
-uses-permission#com.example.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission#com.mostafa.brickblast.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.15.0] /home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/AndroidManifest.xml:26:22-94

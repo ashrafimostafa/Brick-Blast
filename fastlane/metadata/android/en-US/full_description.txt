@@ -1,0 +1,20 @@
+Brick Blast is a fast, offline brick-breaker built with Jetpack Compose.
+
+Drag to aim, release to launch a stream of balls, and bounce them off the
+walls to smash the descending bricks before they reach the bottom. Each round
+the bricks move down and a new row appears, so plan your angles carefully.
+
+Features:
+
+* Turn-based aim-and-shoot gameplay with a trajectory preview
+* Custom physics with realistic bouncing and a smooth 60 FPS game loop
+* Collectable extra balls that grow your arsenal every round
+* Power-ups: bomb, laser, multi-ball and double damage
+* Multiple modes: Classic, Challenge, Time Attack and Hardcore
+* Particle effects and satisfying brick-destruction animations
+* Light and dark themes with an animated theme switch
+* High-score tracking and statistics
+* Share your score as an image
+* Completely offline - no ads, no tracking, no internet permission
+
+Break. Bounce. Blast.
