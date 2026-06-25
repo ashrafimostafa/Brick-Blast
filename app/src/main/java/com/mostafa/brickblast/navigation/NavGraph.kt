@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.ui.screens.challenge.ChallengeSelectScreen
+import com.mostafa.brickblast.ui.viewmodel.ChallengeViewModel
 import com.mostafa.brickblast.ui.screens.game.GameOverScreen
 import com.mostafa.brickblast.ui.screens.game.GameScreen
 import com.mostafa.brickblast.ui.screens.game.PauseScreen
@@ -63,7 +64,10 @@ fun BrickBlastNavGraph(navController: NavHostController) {
         }
 
         composable<ChallengeSelectRoute> {
+            val vm: ChallengeViewModel = hiltViewModel()
+            val progress by vm.progress.collectAsState()
             ChallengeSelectScreen(
+                progress = progress,
                 onSelectLevel = { level ->
                     navController.navigate(GameRoute(mode = "CHALLENGE", challengeLevel = level))
                 },

@@ -5,6 +5,7 @@ import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.model.GameSaveState
 import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
+import com.mostafa.brickblast.domain.model.ChallengeProgress
 import com.mostafa.brickblast.domain.model.UpgradeType
 import kotlinx.coroutines.flow.Flow
 
@@ -45,4 +46,10 @@ interface HighScoreRepository {
     suspend fun saveHighScore(score: Int, round: Int, mode: String)
     suspend fun getBestScore(): Int
     fun getTopScores(limit: Int = 10): Flow<List<Triple<Int, Int, String>>>
+}
+
+interface ChallengeRepository {
+    val progress: Flow<ChallengeProgress>
+    suspend fun getProgress(): ChallengeProgress
+    suspend fun completeLevel(level: Int)
 }

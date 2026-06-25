@@ -9,10 +9,12 @@ import com.mostafa.brickblast.data.local.dao.HighScoreDao
 import com.mostafa.brickblast.data.local.dao.PlayerStatsDao
 import com.mostafa.brickblast.data.local.dao.PlayerUpgradesDao
 import com.mostafa.brickblast.data.local.dao.PlayerWalletDao
+import com.mostafa.brickblast.data.repository.ChallengeRepositoryImpl
 import com.mostafa.brickblast.data.repository.GameSaveRepositoryImpl
 import com.mostafa.brickblast.data.repository.HighScoreRepositoryImpl
 import com.mostafa.brickblast.data.repository.PlayerRepositoryImpl
 import com.mostafa.brickblast.data.repository.SettingsRepositoryImpl
+import com.mostafa.brickblast.domain.repository.ChallengeRepository
 import com.mostafa.brickblast.domain.repository.GameSaveRepository
 import com.mostafa.brickblast.domain.repository.HighScoreRepository
 import com.mostafa.brickblast.domain.repository.PlayerRepository
@@ -68,6 +70,9 @@ abstract class RepositoryModule {
 
     @Binds @Singleton
     abstract fun bindHighScoreRepository(impl: HighScoreRepositoryImpl): HighScoreRepository
+
+    @Binds @Singleton
+    abstract fun bindChallengeRepository(impl: ChallengeRepositoryImpl): ChallengeRepository
 }
 
 @Module

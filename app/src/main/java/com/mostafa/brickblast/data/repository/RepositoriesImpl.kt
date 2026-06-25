@@ -1,5 +1,6 @@
 package com.mostafa.brickblast.data.repository
 
+import com.mostafa.brickblast.data.local.ChallengeProgressStore
 import com.mostafa.brickblast.data.local.SettingsDataStore
 import com.mostafa.brickblast.data.local.dao.AchievementDao
 import com.mostafa.brickblast.data.local.dao.GameSaveDao
@@ -16,11 +17,13 @@ import com.mostafa.brickblast.data.local.entity.PlayerWalletEntity
 import com.mostafa.brickblast.domain.model.Achievement
 import com.mostafa.brickblast.domain.model.AchievementDefinitions
 import com.mostafa.brickblast.domain.model.AppSettings
+import com.mostafa.brickblast.domain.model.ChallengeProgress
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GameSaveState
 import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
+import com.mostafa.brickblast.domain.repository.ChallengeRepository
 import com.mostafa.brickblast.domain.repository.GameSaveRepository
 import com.mostafa.brickblast.domain.repository.HighScoreRepository
 import com.mostafa.brickblast.domain.repository.PlayerRepository
@@ -262,4 +265,16 @@ class HighScoreRepositoryImpl @Inject constructor(
         highScoreDao.getTopScores(limit).map { list ->
             list.map { Triple(it.score, it.round, it.mode) }
         }
+}
+
+@Singleton
+class ChallengeRepositoryImpl @Inject constructor(
+    private val store: ChallengeProgressStore
+) : ChallengeRepository {
+
+    override val progress = store.progress
+
+    override suspend fun getProgress(): ChallengeProgress = store.getProgress()
+
+    override suspend fun completeLevel(level: Int) = store.completeLevel(level)
 }

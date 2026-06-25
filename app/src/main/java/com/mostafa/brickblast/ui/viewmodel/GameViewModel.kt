@@ -11,6 +11,7 @@ import com.mostafa.brickblast.domain.model.GameSaveState
 import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
+import com.mostafa.brickblast.domain.repository.ChallengeRepository
 import com.mostafa.brickblast.domain.repository.GameSaveRepository
 import com.mostafa.brickblast.domain.repository.HighScoreRepository
 import com.mostafa.brickblast.domain.repository.PlayerRepository
@@ -53,6 +54,7 @@ class GameViewModel @Inject constructor(
     private val gameSaveRepository: GameSaveRepository,
     private val highScoreRepository: HighScoreRepository,
     private val settingsRepository: SettingsRepository,
+    private val challengeRepository: ChallengeRepository,
     private val audioManager: AudioManager
 ) : ViewModel() {
 
@@ -242,6 +244,9 @@ class GameViewModel @Inject constructor(
         persistProgress()
         highScoreRepository.saveHighScore(engine.score, engine.round, engine.config.mode.name)
         gameSaveRepository.clearSave()
+        if (isVictory && engine.config.mode == GameMode.CHALLENGE) {
+            challengeRepository.completeLevel(engine.config.challengeLevel)
+        }
         _uiState.update {
             it.copy(
                 phase = if (isVictory) GamePhase.VICTORY else GamePhase.GAME_OVER,

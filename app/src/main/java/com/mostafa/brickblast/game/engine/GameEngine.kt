@@ -143,10 +143,16 @@ class GameEngine {
         physics.timeScale = 1f
         doubleDamageActive = false
 
-        if (restoredRound <= 1) {
+        if (gameConfig.mode == GameMode.CHALLENGE) {
+            val rows = (2 + gameConfig.challengeLevel / 12).coerceIn(2, 12)
+            repeat(rows) {
+                moveBricksDown()
+                spawnTopRow()
+            }
+        } else if (restoredRound <= 1) {
             spawnInitialBricks()
         } else {
-            repeat(minOf(round, 5)) {
+            repeat(minOf(restoredRound, 5)) {
                 moveBricksDown()
                 spawnTopRow()
             }
@@ -169,10 +175,26 @@ class GameEngine {
      * Brick HP scales with the round for a smooth difficulty curve.
      * Early rounds are easy (round 1 -> 1..3 HP) and grow steadily.
      */
-    private fun brickHpForRound(): Int = round + Random.nextInt(0, 3)
+    private fun brickHpForRound(): Int {
+        if (config.mode == GameMode.CHALLENGE) {
+            val level = config.challengeLevel
+            return (level / 2 + Random.nextInt(1, 4)).coerceAtMost(80)
+        }
+        return round + Random.nextInt(0, 3)
+    }
 
     /** Fraction of cells left empty so rows are not a solid wall. */
-    private fun gapChance(): Float = if (round <= 2) 0.35f else 0.2f
+    private fun gapChance(): Float {
+        if (config.mode == GameMode.CHALLENGE) {
+            return when {
+                config.challengeLevel <= 10 -> 0.30f
+                config.challengeLevel <= 40 -> 0.22f
+                config.challengeLevel <= 80 -> 0.15f
+                else -> 0.10f
+            }
+        }
+        return if (round <= 2) 0.35f else 0.2f
+    }
 
     fun spawnTopRow() {
         val y = bounds.brickAreaTop

@@ -6,6 +6,8 @@ import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
+import com.mostafa.brickblast.domain.model.ChallengeProgress
+import com.mostafa.brickblast.domain.repository.ChallengeRepository
 import com.mostafa.brickblast.domain.repository.GameSaveRepository
 import com.mostafa.brickblast.domain.repository.HighScoreRepository
 import com.mostafa.brickblast.domain.repository.PlayerRepository
@@ -27,6 +29,14 @@ class MenuViewModel @Inject constructor(
 
     val coins = playerRepository.coins
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+}
+
+@HiltViewModel
+class ChallengeViewModel @Inject constructor(
+    challengeRepository: ChallengeRepository
+) : ViewModel() {
+    val progress = challengeRepository.progress
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChallengeProgress())
 }
 
 @HiltViewModel
