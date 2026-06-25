@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1
+
+- Fix ad in ci
+
+
 ## v1.1.0
 
 - Add save me option with ad reward
