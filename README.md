@@ -24,7 +24,7 @@ Drag to aim, release to launch a stream of balls, and bounce them off the walls 
 - Power-ups: bomb, laser, multi-ball, and double damage
 - Game modes: **Classic**, **Challenge**, **Time Attack**, **Hardcore**
 - Brick destruction animations and particle effects
-- Light and dark themes with a Telegram-style animated theme switch
+- Light and dark themes
 - High-score tracking, statistics, and auto-save
 - Share your score as an image to social apps
 - Completely offline — no ads, no tracking, no internet permission
@@ -71,7 +71,6 @@ This project is prepared for [F-Droid](https://f-droid.org/) submission:
 - **Store listing:** [fastlane/metadata/android/en-US/](fastlane/metadata/android/en-US/)
 - **Screenshots:** [fastlane/metadata/android/en-US/images/phoneScreenshots/](fastlane/metadata/android/en-US/images/phoneScreenshots/)
 
-Before submitting, push the repo to a public git host, tag a release (e.g. `v1.0.0`), and update the URLs in the F-Droid metadata file.
 
 ## Project structure
 
@@ -84,11 +83,6 @@ app/src/main/java/com/mostafa/brickblast/
 ├── di/            Hilt modules
 └── ui/            Screens, ViewModels, theme, components
 ```
-
-## Contact
-
-**Developer:** Mostafa Ashrafi  
-**Email:** [ashrafimostafa@gmail.com](mailto:ashrafimostafa@gmail.com)
 
 ## License
 
