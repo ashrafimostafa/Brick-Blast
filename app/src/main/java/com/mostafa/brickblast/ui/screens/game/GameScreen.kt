@@ -56,11 +56,15 @@ fun GameScreen(
     val textMeasurer = rememberTextMeasurer(cacheSize = 128)
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var frameTick by remember { mutableIntStateOf(0) }
+    var lastReportedPhase by remember(mode, challengeLevel, continueGame) {
+        mutableStateOf<GamePhase?>(null)
+    }
 
     LaunchedEffect(canvasSize, mode, challengeLevel, continueGame) {
         if (canvasSize.width > 0 && canvasSize.height > 0) {
             viewModel.setScreenSize(canvasSize.width.toFloat(), canvasSize.height.toFloat())
             viewModel.startGame(mode, challengeLevel, continueGame)
+            lastReportedPhase = GamePhase.AIMING
         }
     }
 
@@ -79,6 +83,10 @@ fun GameScreen(
     }
 
     LaunchedEffect(uiState.phase) {
+        val previous = lastReportedPhase
+        lastReportedPhase = uiState.phase
+        if (previous == null) return@LaunchedEffect
+        if (previous == uiState.phase) return@LaunchedEffect
         when (uiState.phase) {
             GamePhase.GAME_OVER -> onGameOver(engine.score, engine.round)
             GamePhase.VICTORY -> onVictory(engine.score, engine.round)

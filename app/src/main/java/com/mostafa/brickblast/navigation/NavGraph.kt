@@ -86,7 +86,9 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 continueGame = route.continueGame,
                 onPause = { navController.navigate(PauseRoute) },
                 onGameOver = { score, round ->
-                    navController.navigate(GameOverRoute(score, round, route.mode)) {
+                    navController.navigate(
+                        GameOverRoute(score, round, route.mode, route.challengeLevel)
+                    ) {
                         popUpTo<GameRoute> { inclusive = true }
                     }
                 },
@@ -135,7 +137,11 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 score = route.score,
                 round = route.round,
                 mode = route.mode,
-                onRetry = { navController.navigate(GameRoute(route.mode)) { popUpTo(MainMenuRoute) } },
+                onRetry = {
+                    navController.navigate(GameRoute(route.mode, route.challengeLevel)) {
+                        popUpTo(MainMenuRoute)
+                    }
+                },
                 onBack = { navController.popBackStack(MainMenuRoute, inclusive = false) }
             )
         }

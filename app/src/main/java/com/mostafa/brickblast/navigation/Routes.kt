@@ -14,7 +14,12 @@ import kotlinx.serialization.Serializable
 @Serializable object UpgradeRoute
 @Serializable object StatisticsRoute
 @Serializable object ShopRoute
-@Serializable data class GameOverRoute(val score: Int, val round: Int, val mode: String)
+@Serializable data class GameOverRoute(
+    val score: Int,
+    val round: Int,
+    val mode: String,
+    val challengeLevel: Int = 1
+)
 @Serializable data class VictoryRoute(
     val score: Int,
     val round: Int,

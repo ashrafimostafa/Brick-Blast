@@ -70,12 +70,21 @@ class GameViewModel @Inject constructor(
     private var lastBounceSoundMs = 0L
 
     fun startGame(mode: GameMode, challengeLevel: Int = 1, continueGame: Boolean = false) {
-        if (gameStarted) {
+        val restarting = engine.phase == GamePhase.GAME_OVER || engine.phase == GamePhase.VICTORY
+        if (gameStarted && engine.phase == GamePhase.PAUSED) {
             resume()
             return
         }
+        if (gameStarted && !restarting) {
+            return
+        }
+
         gameStarted = true
         gameEndHandled = false
+        running = false
+        // Clear end-state immediately so GameScreen does not bounce back to GameOver
+        // before the async init finishes (reused ViewModel + singleton engine).
+        _uiState.update { it.copy(phase = GamePhase.AIMING) }
 
         viewModelScope.launch {
             val upgrades = playerRepository.getUpgrades()
@@ -246,6 +255,7 @@ class GameViewModel @Inject constructor(
         if (gameEndHandled) return
         gameEndHandled = true
         running = false
+        gameStarted = false
         if (!isVictory) audioManager.play(SoundEffect.GAME_OVER)
         persistProgress()
         highScoreRepository.saveHighScore(engine.score, engine.round, engine.config.mode.name)
