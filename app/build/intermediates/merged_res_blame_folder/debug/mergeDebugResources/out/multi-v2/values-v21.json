@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.mostafa.brickblast.app-mergeDebugResources-64:/values-v21/values-v21.xml",
+            "outputFile": "com.mostafa.brickblast.app-mergeDebugResources-2:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "/home/mostafa/.gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/res/values-v21/values-v21.xml",
+                    "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/caches/8.9/transforms/5488dcac22d0b780941d01dd10c2b70d/transformed/core-1.15.0/res/values-v21/values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",
