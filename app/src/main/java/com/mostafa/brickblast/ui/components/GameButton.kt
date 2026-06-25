@@ -11,6 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -32,7 +37,11 @@ fun GameButton(
         modifier = modifier
             .fillMaxWidth()
             .height(52.dp)
-            .scale(scale),
+            .scale(scale)
+            .semantics {
+                role = Role.Button
+                contentDescription = text
+            },
         enabled = enabled,
         interactionSource = interactionSource,
         colors = ButtonDefaults.buttonColors(
@@ -40,7 +49,7 @@ fun GameButton(
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
     ) {
-        Text(text)
+        Text(text, modifier = Modifier.semantics { invisibleToUser() })
     }
 }
 
@@ -59,13 +68,17 @@ fun SecondaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .scale(scale),
+            .scale(scale)
+            .semantics {
+                role = Role.Button
+                contentDescription = text
+            },
         interactionSource = interactionSource,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
-        Text(text)
+        Text(text, modifier = Modifier.semantics { invisibleToUser() })
     }
 }

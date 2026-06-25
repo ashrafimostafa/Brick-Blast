@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,12 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GamePhase
 import com.mostafa.brickblast.game.renderer.GameRenderer
+import com.mostafa.brickblast.ui.accessibility.GameAccessibility
+import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
 import com.mostafa.brickblast.ui.components.AchievementPopup
 import com.mostafa.brickblast.ui.viewmodel.GameViewModel
 
@@ -84,8 +89,8 @@ fun GameScreen(
         }
     }
 
-    LaunchedEffect(uiState.isAiming, uiState.phase) {
-        if (uiState.isAiming) {
+    LaunchedEffect(engine.isAiming, uiState.phase) {
+        if (engine.isAiming) {
             trajectoryPoints = engine.getTrajectoryPoints()
         }
     }
@@ -99,9 +104,26 @@ fun GameScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // TalkBack reads game stats from this live region (Canvas HUD is not accessible).
+        LiveRegionAnnouncement(
+            text = GameAccessibility.statusDescription(
+                score = engine.score,
+                bestScore = engine.bestScore,
+                round = engine.round,
+                totalBalls = engine.totalBalls,
+                coins = engine.coinsThisSession,
+                phase = uiState.phase,
+                isAiming = engine.isAiming,
+                timeRemaining = if (engine.config.mode == GameMode.TIME_ATTACK)
+                    engine.timeAttackRemaining else null
+            ),
+            modifier = Modifier.align(Alignment.TopStart)
+        )
+
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
+                .semantics { contentDescription = GameAccessibility.GAME_BOARD_DESCRIPTION }
                 .onSizeChanged { size -> canvasSize = size }
                 .pointerInput(Unit) {
                     detectDragGestures(
@@ -158,8 +180,10 @@ fun GameScreen(
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
                 .padding(16.dp)
+                .size(56.dp)
+                .semantics { contentDescription = "Pause game" }
         ) {
-            Icon(Icons.Default.Pause, contentDescription = "Pause")
+            Icon(Icons.Default.Pause, contentDescription = null)
         }
 
         if (uiState.newAchievements.isNotEmpty()) {

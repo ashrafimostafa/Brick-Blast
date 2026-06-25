@@ -19,19 +19,28 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.ui.accessibility.rememberReducedMotion
+import com.mostafa.brickblast.ui.accessibility.screenHeading
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
+    val reducedMotion = rememberReducedMotion()
     val alpha = remember { Animatable(0f) }
     val ink = MaterialTheme.colorScheme.onBackground
     val accent = MaterialTheme.colorScheme.primary
 
-    LaunchedEffect(Unit) {
-        alpha.animateTo(1f, animationSpec = tween(800))
-        delay(1500)
-        alpha.animateTo(0f, animationSpec = tween(500))
-        onFinished()
+    LaunchedEffect(reducedMotion) {
+        if (reducedMotion) {
+            alpha.snapTo(1f)
+            delay(400)
+            onFinished()
+        } else {
+            alpha.animateTo(1f, animationSpec = tween(800))
+            delay(1500)
+            alpha.animateTo(0f, animationSpec = tween(500))
+            onFinished()
+        }
     }
 
     Box(
@@ -49,7 +58,8 @@ fun SplashScreen(onFinished: () -> Unit) {
                 text = "BRICK BLAST",
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
-                color = accent
+                color = accent,
+                modifier = Modifier.screenHeading()
             )
             Text(
                 text = "Break. Bounce. Blast.",

@@ -36,12 +36,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mostafa.brickblast.domain.model.ChallengeConfig
 import com.mostafa.brickblast.domain.model.ChallengeProgress
+import com.mostafa.brickblast.ui.accessibility.screenHeading
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,10 +64,13 @@ fun ChallengeSelectScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Challenge Mode") },
+                title = { Text("Challenge Mode", modifier = Modifier.screenHeading()) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.semantics { contentDescription = "Navigate back" }
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 }
             )
@@ -107,7 +117,9 @@ fun ChallengeSelectScreen(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .screenHeading()
                 )
                 IconButton(
                     onClick = {
@@ -156,9 +168,23 @@ private fun ChallengeLevelCard(
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
+    val a11yLabel = when {
+        !unlocked -> "Level $level, locked"
+        completed -> "Level $level, completed"
+        else -> "Level $level"
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                contentDescription = a11yLabel
+                if (unlocked) {
+                    role = Role.Button
+                } else {
+                    disabled()
+                }
+            }
             .clickable(enabled = unlocked) { onClick() },
         colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
@@ -172,12 +198,13 @@ private fun ChallengeLevelCard(
                 "$level",
                 color = textColor,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                modifier = Modifier.semantics { invisibleToUser() }
             )
             if (!unlocked) {
                 Icon(
                     Icons.Default.Lock,
-                    contentDescription = "Locked",
+                    contentDescription = null,
                     tint = textColor,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -187,7 +214,7 @@ private fun ChallengeLevelCard(
             } else if (completed) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Completed",
+                    contentDescription = null,
                     tint = Color(0xFF69F0AE),
                     modifier = Modifier
                         .align(Alignment.TopEnd)

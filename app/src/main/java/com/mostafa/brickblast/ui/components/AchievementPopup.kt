@@ -17,10 +17,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mostafa.brickblast.domain.model.Achievement
+import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
+import com.mostafa.brickblast.ui.accessibility.rememberReducedMotion
 import kotlinx.coroutines.delay
 
 @Composable
@@ -30,22 +34,29 @@ fun AchievementPopup(
     modifier: Modifier = Modifier
 ) {
     val achievement = achievements.firstOrNull() ?: return
+    val reducedMotion = rememberReducedMotion()
+    val announcement = "Achievement unlocked: ${achievement.title}. ${achievement.description}"
 
     LaunchedEffect(achievement.id) {
         delay(3000)
         onDismiss()
     }
 
+    LiveRegionAnnouncement(text = announcement)
+
     AnimatedVisibility(
         visible = true,
-        enter = fadeIn(tween(400)) + scaleIn(tween(400)),
-        exit = fadeOut(tween(300)),
+        enter = if (reducedMotion) fadeIn(tween(0)) else fadeIn(tween(400)) + scaleIn(tween(400)),
+        exit = if (reducedMotion) fadeOut(tween(0)) else fadeOut(tween(300)),
         modifier = modifier
     ) {
         Column(
             modifier = Modifier
                 .background(Color(0xFF1B5E20).copy(0.9f), RoundedCornerShape(12.dp))
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .semantics(mergeDescendants = true) {
+                    contentDescription = announcement
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {

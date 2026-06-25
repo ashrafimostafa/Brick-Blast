@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.repository.SettingsRepository
 import com.mostafa.brickblast.navigation.BrickBlastNavGraph
+import com.mostafa.brickblast.ui.accessibility.rememberReducedMotion
 import com.mostafa.brickblast.ui.theme.BrickBlastTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -69,6 +70,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun ThemedAppRoot(targetDark: Boolean, initialDark: Boolean) {
+    val reducedMotion = rememberReducedMotion()
     val graphicsLayer = rememberGraphicsLayer()
     var renderedDark by remember { mutableStateOf(initialDark) }
     var oldSnapshot by remember { mutableStateOf<ImageBitmap?>(null) }
@@ -82,7 +84,11 @@ private fun ThemedAppRoot(targetDark: Boolean, initialDark: Boolean) {
         oldSnapshot = runCatching { graphicsLayer.toImageBitmap() }.getOrNull()
         revealCenter = ThemeRevealController.origin ?: Offset.Zero
         renderedDark = targetDark
-        if (oldSnapshot == null) return@LaunchedEffect
+        if (oldSnapshot == null || reducedMotion) {
+            oldSnapshot = null
+            reveal.snapTo(1f)
+            return@LaunchedEffect
+        }
         reveal.snapTo(0f)
         reveal.animateTo(1f, tween(durationMillis = 480, easing = FastOutSlowInEasing))
         oldSnapshot = null

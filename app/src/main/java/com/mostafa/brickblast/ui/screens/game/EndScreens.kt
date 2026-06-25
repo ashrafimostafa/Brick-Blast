@@ -27,9 +27,13 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
+import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.components.SecondaryButton
 import com.mostafa.brickblast.ui.util.ScoreShareCard
@@ -49,7 +53,13 @@ fun PauseScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Paused", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(
+            "Paused",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier.screenHeading()
+        )
         Text(
             "Take a break",
             fontSize = 16.sp,
@@ -137,6 +147,10 @@ private fun EndGameScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        LiveRegionAnnouncement(
+            text = "$title. Final score $score points. $subtitle. Mode ${mode.replace('_', ' ')}."
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -144,7 +158,13 @@ private fun EndGameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(title, fontSize = 36.sp, fontWeight = FontWeight.Bold, color = titleColor)
+            Text(
+                title,
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Bold,
+                color = titleColor,
+                modifier = Modifier.screenHeading()
+            )
             Text(
                 subtitle,
                 fontSize = 16.sp,
@@ -156,7 +176,10 @@ private fun EndGameScreen(
                 text = score.toString(),
                 fontSize = 56.sp,
                 fontWeight = FontWeight.Bold,
-                color = ink
+                color = ink,
+                modifier = Modifier.semantics {
+                    contentDescription = "Score $score points"
+                }
             )
             Text(
                 text = "SCORE",

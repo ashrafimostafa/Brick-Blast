@@ -1,6 +1,7 @@
 package com.mostafa.brickblast.ui.screens.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,11 +29,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostafa.brickblast.ThemeRevealController
+import com.mostafa.brickblast.ui.accessibility.screenHeading
+import com.mostafa.brickblast.ui.accessibility.toggleRowSemantics
 import com.mostafa.brickblast.ui.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,10 +52,13 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text("Settings", modifier = Modifier.screenHeading()) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.semantics { contentDescription = "Navigate back" }
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 }
             )
@@ -83,7 +92,9 @@ private fun ThemeToggleRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .toggleRowSemantics("Dark Theme", checked)
+            .clickable { onCheckedChange(!checked) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -91,7 +102,8 @@ private fun ThemeToggleRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit)
             "Dark Theme",
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.semantics { invisibleToUser() }
         )
         Switch(
             checked = checked,
@@ -99,13 +111,15 @@ private fun ThemeToggleRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit)
                 ThemeRevealController.origin = switchCenter
                 onCheckedChange(it)
             },
-            modifier = Modifier.onGloballyPositioned { coords ->
-                val pos = coords.positionInRoot()
-                switchCenter = Offset(
-                    pos.x + coords.size.width / 2f,
-                    pos.y + coords.size.height / 2f
-                )
-            }
+            modifier = Modifier
+                .onGloballyPositioned { coords ->
+                    val pos = coords.positionInRoot()
+                    switchCenter = Offset(
+                        pos.x + coords.size.width / 2f,
+                        pos.y + coords.size.height / 2f
+                    )
+                }
+                .semantics { invisibleToUser() }
         )
     }
 }
@@ -115,7 +129,9 @@ private fun SettingToggle(label: String, checked: Boolean, onCheckedChange: (Boo
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .toggleRowSemantics(label, checked)
+            .clickable { onCheckedChange(!checked) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -123,8 +139,13 @@ private fun SettingToggle(label: String, checked: Boolean, onCheckedChange: (Boo
             label,
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.semantics { invisibleToUser() }
         )
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.semantics { invisibleToUser() }
+        )
     }
 }

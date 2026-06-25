@@ -19,11 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.viewmodel.StatisticsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,10 +42,13 @@ fun StatisticsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Statistics") },
+                title = { Text("Statistics", modifier = Modifier.screenHeading()) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.semantics { contentDescription = "Navigate back" }
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 }
             )
@@ -57,7 +63,13 @@ fun StatisticsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Player Stats", color = Color(0xFF448AFF), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(
+                "Player Stats",
+                color = Color(0xFF448AFF),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier.screenHeading()
+            )
             StatLine("Highest Round", stats.highestRound.toString())
             StatLine("Bricks Destroyed", stats.totalBricksDestroyed.toString())
             StatLine("Balls Launched", stats.totalBallsLaunched.toString())
@@ -65,12 +77,28 @@ fun StatisticsScreen(
             StatLine("Coins Earned", stats.totalCoinsEarned.toString())
             StatLine("Games Played", stats.totalGamesPlayed.toString())
 
-            Text("High Scores", color = Color(0xFF448AFF), fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 16.dp))
+            Text(
+                "High Scores",
+                color = Color(0xFF448AFF),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .screenHeading()
+            )
             topScores.forEachIndexed { i, (score, round, mode) ->
                 StatLine("#${i + 1} $mode", "$score (R$round)")
             }
 
-            Text("Achievements", color = Color(0xFF448AFF), fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 16.dp))
+            Text(
+                "Achievements",
+                color = Color(0xFF448AFF),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .screenHeading()
+            )
             achievements.forEach { a ->
                 val status = if (a.unlocked) "✓" else "${a.progress}/${a.target}"
                 StatLine(a.title, status)
@@ -81,7 +109,12 @@ fun StatisticsScreen(
 
 @Composable
 private fun StatLine(label: String, value: String) {
-    Text("$label: $value", color = Color.White, fontSize = 15.sp)
+    Text(
+        "$label: $value",
+        color = Color.White,
+        fontSize = 15.sp,
+        modifier = Modifier.semantics { contentDescription = "$label, $value" }
+    )
 }
 
 private fun formatPlayTime(ms: Long): String {

@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.components.SecondaryButton
 
@@ -43,7 +45,8 @@ fun MainMenuScreen(
             text = "BRICK BLAST",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
-            color = titleColor
+            color = titleColor,
+            modifier = Modifier.screenHeading()
         )
         Spacer(modifier = Modifier.height(48.dp))
 

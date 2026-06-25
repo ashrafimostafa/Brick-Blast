@@ -166,3 +166,18 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/android,androidstudio
 
+# Project generated outputs
+/build/
+/app/build/
+**/build/
+**/.gradle/
+**/kspCaches/
+**/tmp/
+**/intermediates/
+**/generated/
+
+# Kotlin/Java compiler caches
+*.kotlin_module
+*.dex
+*.class
+
