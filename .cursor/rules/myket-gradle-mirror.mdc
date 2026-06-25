@@ -1,0 +1,61 @@
+---
+description: Use Myket Iranian Maven/Gradle mirrors for Android builds
+globs: **/*.{gradle,gradle.kts,properties}
+alwaysApply: true
+---
+
+# Myket Maven & Gradle Mirror (Iran)
+
+Always configure Android/Gradle projects to use the Iranian Myket mirror first.
+
+## Maven repository
+
+URL: `https://maven.myket.ir`
+
+In `settings.gradle.kts`, put Myket **before** `google()` and `mavenCentral()`:
+
+```kotlin
+pluginManagement {
+    repositories {
+        maven(url = "https://maven.myket.ir")
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven(url = "https://maven.myket.ir")
+        google()
+        mavenCentral()
+    }
+}
+```
+
+For legacy Groovy `build.gradle`:
+
+```groovy
+repositories {
+    maven { url 'https://maven.myket.ir' }
+    google()
+    mavenCentral()
+}
+```
+
+## Gradle Wrapper distribution
+
+In `gradle/wrapper/gradle-wrapper.properties`, use Myket for the Gradle ZIP:
+
+```properties
+distributionUrl=https\://maven.myket.ir/gradle/distributions/gradle-<VERSION>-bin.zip
+```
+
+Replace `<VERSION>` with the project's Gradle version (e.g. `8.9`).
+
+## When creating new Android projects
+
+1. Add Myket to `settings.gradle.kts` repositories (first entry).
+2. Point `gradle-wrapper.properties` `distributionUrl` to `https://maven.myket.ir/gradle/distributions/...`.
+3. Do not remove `google()` / `mavenCentral()` — keep them as fallback after Myket.

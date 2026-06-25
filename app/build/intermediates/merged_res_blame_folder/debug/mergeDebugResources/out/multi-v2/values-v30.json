@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.brickblast.app-mergeDebugResources-2:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "/tmp/cursor-sandbox-cache/e34f39883f9fc322faa4a7ef0de40309/gradle/caches/8.9/transforms/47730fd0e54e53cd481a80f3094fc6e5/transformed/material3-release/res/values-v30/values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}

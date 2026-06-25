@@ -1,0 +1,80 @@
+package com.example.brickblast.di
+
+import android.content.Context
+import androidx.room.Room
+import com.example.brickblast.data.local.BrickBlastDatabase
+import com.example.brickblast.data.local.dao.AchievementDao
+import com.example.brickblast.data.local.dao.GameSaveDao
+import com.example.brickblast.data.local.dao.HighScoreDao
+import com.example.brickblast.data.local.dao.PlayerStatsDao
+import com.example.brickblast.data.local.dao.PlayerUpgradesDao
+import com.example.brickblast.data.local.dao.PlayerWalletDao
+import com.example.brickblast.data.repository.GameSaveRepositoryImpl
+import com.example.brickblast.data.repository.HighScoreRepositoryImpl
+import com.example.brickblast.data.repository.PlayerRepositoryImpl
+import com.example.brickblast.data.repository.SettingsRepositoryImpl
+import com.example.brickblast.domain.repository.GameSaveRepository
+import com.example.brickblast.domain.repository.HighScoreRepository
+import com.example.brickblast.domain.repository.PlayerRepository
+import com.example.brickblast.domain.repository.SettingsRepository
+import com.example.brickblast.game.engine.GameEngine
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppContextModule {
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context = context
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): BrickBlastDatabase =
+        Room.databaseBuilder(context, BrickBlastDatabase::class.java, "brick_blast.db")
+            .fallbackToDestructiveMigration()
+            .build()
+
+    @Provides fun provideHighScoreDao(db: BrickBlastDatabase): HighScoreDao = db.highScoreDao()
+    @Provides fun provideAchievementDao(db: BrickBlastDatabase): AchievementDao = db.achievementDao()
+    @Provides fun providePlayerStatsDao(db: BrickBlastDatabase): PlayerStatsDao = db.playerStatsDao()
+    @Provides fun providePlayerUpgradesDao(db: BrickBlastDatabase): PlayerUpgradesDao = db.playerUpgradesDao()
+    @Provides fun providePlayerWalletDao(db: BrickBlastDatabase): PlayerWalletDao = db.playerWalletDao()
+    @Provides fun provideGameSaveDao(db: BrickBlastDatabase): GameSaveDao = db.gameSaveDao()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    @Binds @Singleton
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds @Singleton
+    abstract fun bindPlayerRepository(impl: PlayerRepositoryImpl): PlayerRepository
+
+    @Binds @Singleton
+    abstract fun bindGameSaveRepository(impl: GameSaveRepositoryImpl): GameSaveRepository
+
+    @Binds @Singleton
+    abstract fun bindHighScoreRepository(impl: HighScoreRepositoryImpl): HighScoreRepository
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object GameModule {
+
+    @Provides
+    @Singleton
+    fun provideGameEngine(): GameEngine = GameEngine()
+}
