@@ -114,18 +114,9 @@ class GameViewModel @Inject constructor(
             }
             engine.onBallBounce = {
                 val now = System.currentTimeMillis()
-                if (now - lastBounceSoundMs > 100L) {
+                if (now - lastBounceSoundMs > 180L) {
                     audioManager.play(SoundEffect.BOUNCE)
                     lastBounceSoundMs = now
-                }
-                if (_uiState.value.particleEffects) {
-                    var activeCount = 0
-                    for (b in engine.balls) if (b.active) activeCount++
-                    if (activeCount <= 4) {
-                        engine.balls.firstOrNull { it.active }?.let { ball ->
-                            engine.particles.emitSpark(ball.x, ball.y)
-                        }
-                    }
                 }
             }
             engine.onCollect = { audioManager.play(SoundEffect.COLLECT) }
@@ -144,6 +135,7 @@ class GameViewModel @Inject constructor(
             val w = _uiState.value.screenWidth
             val h = _uiState.value.screenHeight
             engine.initGame(w, h, config, upgrades, restoredRound, restoredBalls, restoredScore)
+            engine.particleEffectsEnabled = settings.particleEffects
 
             _uiState.update {
                 it.copy(
@@ -176,15 +168,29 @@ class GameViewModel @Inject constructor(
 
         engine.update(deltaSeconds)
 
-        // Only push to StateFlow when the phase actually changes. The live HUD and
-        // world are rendered directly from the engine each frame (driven by the
-        // composable's frame clock), so we avoid a full recomposition per frame.
-        if (engine.phase != _uiState.value.phase) {
+        val current = _uiState.value
+        val timeRemaining = if (engine.config.mode == GameMode.TIME_ATTACK) {
+            engine.timeAttackRemaining
+        } else null
+        val timeChanged = timeRemaining != null && (
+            current.timeRemaining == null ||
+            timeRemaining.toInt() != current.timeRemaining!!.toInt()
+        )
+        if (engine.phase != current.phase ||
+            engine.score != current.score ||
+            engine.round != current.round ||
+            engine.totalBalls != current.totalBalls ||
+            engine.coinsThisSession != current.coins ||
+            timeChanged
+        ) {
             _uiState.update {
                 it.copy(
                     phase = engine.phase,
                     score = engine.score,
-                    round = engine.round
+                    round = engine.round,
+                    totalBalls = engine.totalBalls,
+                    coins = engine.coinsThisSession,
+                    timeRemaining = timeRemaining
                 )
             }
         }

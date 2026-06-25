@@ -21,7 +21,9 @@ import kotlin.random.Random
 class GameEngine {
 
     val physics = PhysicsEngine()
-    val particles = ParticleSystem(512)
+    val particles = ParticleSystem(256)
+
+    var particleEffectsEnabled = true
 
     val bricks = ArrayList<Brick>(64)
     val balls = ArrayList<Ball>(32)
@@ -412,7 +414,9 @@ class GameEngine {
         score += coinAmount * 10
 
         if (playEffects) {
-            particles.emitExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, color)
+            if (particleEffectsEnabled) {
+                particles.emitExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, color)
+            }
             addFloatingText(brick.x + brick.width / 2, brick.y, "+${brick.maxHp}")
             if (Random.nextFloat() < 0.08f) {
                 spawnRandomCollectable(brick.x + brick.width / 2, brick.y + brick.height / 2)
@@ -425,12 +429,16 @@ class GameEngine {
         when (c) {
             is Collectable.ExtraBall -> {
                 totalBalls++
-                particles.emitGlowBurst(c.x, c.y, androidx.compose.ui.graphics.Color(0xFF00E5FF))
+                if (particleEffectsEnabled) {
+                    particles.emitGlowBurst(c.x, c.y, androidx.compose.ui.graphics.Color(0xFF00E5FF))
+                }
             }
             is Collectable.Coin -> {
                 coinsThisSession += c.amount
                 score += c.amount * 5
-                particles.emitGlowBurst(c.x, c.y, androidx.compose.ui.graphics.Color(0xFFFFD600))
+                if (particleEffectsEnabled) {
+                    particles.emitGlowBurst(c.x, c.y, androidx.compose.ui.graphics.Color(0xFFFFD600))
+                }
             }
             is Collectable.PowerUpCollectable -> activatePowerUp(c.powerUpType, c.x, c.y)
         }
@@ -438,7 +446,9 @@ class GameEngine {
     }
 
     private fun activatePowerUp(type: PowerUpType, x: Float, y: Float) {
-        particles.emitGlowBurst(x, y, androidx.compose.ui.graphics.Color(0xFFE040FB))
+        if (particleEffectsEnabled) {
+            particles.emitGlowBurst(x, y, androidx.compose.ui.graphics.Color(0xFFE040FB))
+        }
         onPowerUpActivated?.invoke(type)
         when (type) {
             PowerUpType.MULTI_BALL -> totalBalls += 5
@@ -476,8 +486,8 @@ class GameEngine {
                 destroyed++
             }
         }
-        if (destroyed > 0) {
-            particles.emitExplosion(x, y, androidx.compose.ui.graphics.Color(0xFFFF5722), 16)
+        if (destroyed > 0 && particleEffectsEnabled) {
+            particles.emitExplosion(x, y, androidx.compose.ui.graphics.Color(0xFFFF5722), 10)
             sample?.let { onBrickDestroyed?.invoke(it) }
         }
     }
@@ -499,12 +509,12 @@ class GameEngine {
                 destroyed++
             }
         }
-        if (destroyed > 0) {
+        if (destroyed > 0 && particleEffectsEnabled) {
             particles.emitExplosion(
                 targetX + brickWidth / 2f,
                 effectY,
                 androidx.compose.ui.graphics.Color(0xFFE040FB),
-                14
+                10
             )
             sample?.let { onBrickDestroyed?.invoke(it) }
         }
@@ -630,7 +640,7 @@ class GameEngine {
     }
 
     fun getTrajectoryPoints(): FloatArray {
-        if (!isAiming) return FloatArray(0)
+        if (!isAiming) return EMPTY_TRAJECTORY
         val angle = physics.computeLaunchAngle(aimStartX, aimStartY, aimEndX, aimEndY)
         return physics.predictTrajectory(launcherX, launcherY, angle, bounds, bricks)
     }
@@ -652,15 +662,17 @@ class GameEngine {
     fun getPlayTimeMs(): Long = System.currentTimeMillis() - sessionStartTime
 
     companion object {
-        // Duration of the launcher slide between rounds (seconds).
         private const val LAUNCHER_ANIM_DURATION = 0.35f
-
-        fun brickColorForHp(hp: Int): androidx.compose.ui.graphics.Color {
+        private val EMPTY_TRAJECTORY = FloatArray(0)
+        private val BRICK_COLORS: Array<androidx.compose.ui.graphics.Color> = Array(51) { hp ->
             val ratio = (hp.coerceAtMost(50) / 50f)
             val r = (255 * ratio).toInt().coerceIn(50, 255)
             val g = (200 * (1 - ratio)).toInt().coerceIn(50, 200)
             val b = (100 + 155 * (1 - ratio)).toInt().coerceIn(50, 255)
-            return androidx.compose.ui.graphics.Color(r, g, b)
+            androidx.compose.ui.graphics.Color(r, g, b)
         }
+
+        fun brickColorForHp(hp: Int): androidx.compose.ui.graphics.Color =
+            BRICK_COLORS[hp.coerceIn(1, 50)]
     }
 }

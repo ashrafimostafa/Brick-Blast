@@ -23,8 +23,12 @@ class PhysicsEngine(
     }
 
     // Reusable buffers to avoid per-frame allocations in the hot loop.
-    private val collisionBuffer = ArrayList<CollisionResult>(4)
     private val nearbyBuffer = ArrayList<Brick>(16)
+    private val collisionScratch = CollisionScratch()
+    private val bestCollision = CollisionScratch()
+    private val wallNormalX = FloatArray(1)
+    private val wallNormalY = FloatArray(1)
+    private val trajectoryBuffer = FloatArray(120)
 
     var timeScale: Float = 1f
 
@@ -148,37 +152,36 @@ class PhysicsEngine(
                 return
             }
 
-            val wallNormal = CollisionDetector.checkWallCollision(
-                ball, bounds.left, bounds.right, bounds.top
-            )
-            if (wallNormal != null) {
-                CollisionDetector.reflectOffWall(ball, wallNormal.first, wallNormal.second)
+            if (CollisionDetector.checkWallCollision(
+                    ball, bounds.left, bounds.right, bounds.top, wallNormalX, wallNormalY
+                )
+            ) {
+                CollisionDetector.reflectOffWall(ball, wallNormalX[0], wallNormalY[0])
                 onBallBounce(ball)
             }
 
-            collisionBuffer.clear()
+            var hasCollision = false
             spatialGrid.queryInto(ball.x, ball.y, ball.radius + 4f, nearbyBuffer)
             for (k in nearbyBuffer.indices) {
-                CollisionDetector.checkBrickCollision(ball, nearbyBuffer[k])?.let {
-                    collisionBuffer.add(it)
+                if (!CollisionDetector.checkBrickCollision(ball, nearbyBuffer[k], collisionScratch)) {
+                    continue
+                }
+                if (!hasCollision || collisionScratch.penetration > bestCollision.penetration) {
+                    bestCollision.brick = collisionScratch.brick
+                    bestCollision.normalX = collisionScratch.normalX
+                    bestCollision.normalY = collisionScratch.normalY
+                    bestCollision.penetration = collisionScratch.penetration
+                    hasCollision = true
                 }
             }
-            if (collisionBuffer.isNotEmpty()) {
-                var best = collisionBuffer[0]
-                for (j in 1 until collisionBuffer.size) {
-                    if (collisionBuffer[j].penetration > best.penetration) {
-                        best = collisionBuffer[j]
-                    }
-                }
-                CollisionDetector.resolveCollision(ball, best)
-                // Apply damage only on a NEW contact so each ball removes exactly
-                // 1 HP per touch (one ball -> -1), instead of multiple hits while
-                // it overlaps across micro-steps.
-                if (ball.lastHitBrickId != best.brick.id) {
-                    ball.lastHitBrickId = best.brick.id
-                    onBrickHit(best.brick, ball)
-                    if (best.brick.hp <= 0 && !best.brick.isDestroying) {
-                        onBrickDestroyed(best.brick)
+            if (hasCollision) {
+                val hitBrick = bestCollision.brick!!
+                CollisionDetector.resolveCollision(ball, bestCollision)
+                if (ball.lastHitBrickId != hitBrick.id) {
+                    ball.lastHitBrickId = hitBrick.id
+                    onBrickHit(hitBrick, ball)
+                    if (hitBrick.hp <= 0 && !hitBrick.isDestroying) {
+                        onBrickDestroyed(hitBrick)
                     }
                 }
                 onBallBounce(ball)
@@ -247,9 +250,12 @@ class PhysicsEngine(
         angle: Float,
         bounds: GameBounds,
         bricks: List<Brick>,
-        steps: Int = 60
+        steps: Int = 40
     ): FloatArray {
-        val points = FloatArray(steps * 2)
+        val points = trajectoryBuffer
+        val maxPoints = points.size / 2
+        val limit = minOf(steps, maxPoints)
+        points.fill(0f, 0, limit * 2)
         var x = startX
         var y = startY
         val speed = BALL_SPEED
@@ -257,7 +263,7 @@ class PhysicsEngine(
         var vy = speed * kotlin.math.sin(angle)
         val dt = 0.016f
 
-        for (i in 0 until steps) {
+        for (i in 0 until limit) {
             x += vx * dt
             y += vy * dt
 
@@ -268,7 +274,14 @@ class PhysicsEngine(
             points[i * 2] = x
             points[i * 2 + 1] = y
 
-            if (y > bounds.bottom) break
+            if (y > bounds.bottom) {
+                // Zero remaining slots so callers can detect early termination.
+                for (j in (i + 1) until limit) {
+                    points[j * 2] = 0f
+                    points[j * 2 + 1] = 0f
+                }
+                break
+            }
         }
         return points
     }

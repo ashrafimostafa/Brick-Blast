@@ -25,7 +25,11 @@ class SpatialHashGrid(
     private val grid = HashMap<Long, MutableList<Brick>>()
     private var queryStamp = 0
 
-    fun clear() = grid.clear()
+    fun clear() {
+        for (list in grid.values) {
+            list.clear()
+        }
+    }
 
     fun insert(brick: Brick) {
         // Insert the brick into EVERY cell its rectangle overlaps. A brick can be
@@ -85,29 +89,32 @@ object CollisionDetector {
         ball: Ball,
         left: Float,
         right: Float,
-        top: Float
-    ): Pair<Float, Float>? {
-        var nx = 0f
-        var ny = 0f
+        top: Float,
+        outNormalX: FloatArray,
+        outNormalY: FloatArray
+    ): Boolean {
+        outNormalX[0] = 0f
+        outNormalY[0] = 0f
 
         if (ball.x - ball.radius < left) {
             ball.x = left + ball.radius
-            nx = 1f
+            outNormalX[0] = 1f
         } else if (ball.x + ball.radius > right) {
             ball.x = right - ball.radius
-            nx = -1f
+            outNormalX[0] = -1f
         }
 
         if (ball.y - ball.radius < top) {
             ball.y = top + ball.radius
-            ny = 1f
+            outNormalY[0] = 1f
         }
 
-        return if (nx != 0f || ny != 0f) Pair(nx, ny) else null
+        return outNormalX[0] != 0f || outNormalY[0] != 0f
     }
 
-    fun checkBrickCollision(ball: Ball, brick: Brick): CollisionResult? {
-        if (brick.hp <= 0 || brick.isDestroying) return null
+    fun checkBrickCollision(ball: Ball, brick: Brick, scratch: CollisionScratch): Boolean {
+        scratch.clear()
+        if (brick.hp <= 0 || brick.isDestroying) return false
 
         val closestX = ball.x.coerceIn(brick.x, brick.x + brick.width)
         val closestY = ball.y.coerceIn(brick.y, brick.y + brick.height)
@@ -116,7 +123,7 @@ object CollisionDetector {
         val dy = ball.y - closestY
         val distSq = dx * dx + dy * dy
 
-        if (distSq >= ball.radius * ball.radius) return null
+        if (distSq >= ball.radius * ball.radius) return false
 
         val dist = sqrt(distSq)
         val normalX: Float
@@ -124,7 +131,6 @@ object CollisionDetector {
         val penetration: Float
 
         if (dist < 0.001f) {
-            // Ball center inside brick - resolve by smallest overlap axis
             val overlapLeft = ball.x + ball.radius - brick.x
             val overlapRight = brick.x + brick.width - (ball.x - ball.radius)
             val overlapTop = ball.y + ball.radius - brick.y
@@ -142,23 +148,27 @@ object CollisionDetector {
             penetration = ball.radius - dist
         }
 
-        return CollisionResult(brick, normalX, normalY, penetration)
+        scratch.brick = brick
+        scratch.normalX = normalX
+        scratch.normalY = normalY
+        scratch.penetration = penetration
+        return true
     }
 
-    /**
-     * Reflect velocity off the collision normal. Prevents sticking by pushing ball out.
-     */
-    fun resolveCollision(ball: Ball, result: CollisionResult) {
-        ball.x += result.normalX * result.penetration + result.normalX * 0.5f
-        ball.y += result.normalY * result.penetration + result.normalY * 0.5f
+    fun resolveCollision(ball: Ball, scratch: CollisionScratch) {
+        resolveCollision(ball, scratch.normalX, scratch.normalY, scratch.penetration)
+    }
 
-        val dot = ball.vx * result.normalX + ball.vy * result.normalY
+    fun resolveCollision(ball: Ball, normalX: Float, normalY: Float, penetration: Float) {
+        ball.x += normalX * penetration + normalX * 0.5f
+        ball.y += normalY * penetration + normalY * 0.5f
+
+        val dot = ball.vx * normalX + ball.vy * normalY
         if (dot < 0) {
-            ball.vx -= 2 * dot * result.normalX
-            ball.vy -= 2 * dot * result.normalY
+            ball.vx -= 2 * dot * normalX
+            ball.vy -= 2 * dot * normalY
         }
 
-        // Minimum velocity to prevent horizontal/vertical sticking
         val speed = sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
         if (speed > 0.01f) {
             if (abs(ball.vx) < 30f) ball.vx = if (ball.vx >= 0) 30f else -30f

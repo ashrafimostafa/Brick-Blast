@@ -52,20 +52,11 @@ fun GameScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val engine = viewModel.gameEngine
-    // Derive theme from the active Material color scheme so the Canvas (which is
-    // not theme-aware on its own) matches the rest of the app.
     val isDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    // Large cache so brick HP labels (many repeated short strings) are not
-    // re-measured every frame, which was a major source of slowdown on big boards.
-    val textMeasurer = rememberTextMeasurer(cacheSize = 256)
-    var trajectoryPoints by remember { mutableStateOf(FloatArray(0)) }
+    val textMeasurer = rememberTextMeasurer(cacheSize = 128)
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-    // Incremented every display frame; read inside the Canvas draw to invalidate
-    // only the draw phase (not recompose the whole screen) for smooth rendering.
     var frameTick by remember { mutableIntStateOf(0) }
 
-    // Start the game only once the canvas has a real measured size, so the
-    // play area, bricks, and launcher are laid out against the true bounds.
     LaunchedEffect(canvasSize, mode, challengeLevel, continueGame) {
         if (canvasSize.width > 0 && canvasSize.height > 0) {
             viewModel.setScreenSize(canvasSize.width.toFloat(), canvasSize.height.toFloat())
@@ -73,8 +64,6 @@ fun GameScreen(
         }
     }
 
-    // Drive the simulation from the display's frame clock for smooth, vsync-aligned
-    // updates instead of a fixed delay() loop (which stutters).
     LaunchedEffect(Unit) {
         var lastFrame = 0L
         while (true) {
@@ -89,12 +78,6 @@ fun GameScreen(
         }
     }
 
-    LaunchedEffect(engine.isAiming, uiState.phase) {
-        if (engine.isAiming) {
-            trajectoryPoints = engine.getTrajectoryPoints()
-        }
-    }
-
     LaunchedEffect(uiState.phase) {
         when (uiState.phase) {
             GamePhase.GAME_OVER -> onGameOver(engine.score, engine.round)
@@ -104,18 +87,16 @@ fun GameScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // TalkBack reads game stats from this live region (Canvas HUD is not accessible).
         LiveRegionAnnouncement(
             text = GameAccessibility.statusDescription(
-                score = engine.score,
+                score = uiState.score,
                 bestScore = engine.bestScore,
-                round = engine.round,
-                totalBalls = engine.totalBalls,
-                coins = engine.coinsThisSession,
+                round = uiState.round,
+                totalBalls = uiState.totalBalls,
+                coins = uiState.coins,
                 phase = uiState.phase,
                 isAiming = engine.isAiming,
-                timeRemaining = if (engine.config.mode == GameMode.TIME_ATTACK)
-                    engine.timeAttackRemaining else null
+                timeRemaining = uiState.timeRemaining
             ),
             modifier = Modifier.align(Alignment.TopStart)
         )
@@ -129,47 +110,38 @@ fun GameScreen(
                     detectDragGestures(
                         onDragStart = { offset ->
                             viewModel.onDragStart(offset.x, offset.y)
-                            trajectoryPoints = engine.getTrajectoryPoints()
                         },
                         onDrag = { change, _ ->
                             change.consume()
                             viewModel.onDrag(change.position.x, change.position.y)
-                            trajectoryPoints = engine.getTrajectoryPoints()
                         },
-                        onDragEnd = {
-                            viewModel.onDragEnd()
-                            trajectoryPoints = FloatArray(0)
-                        },
-                        onDragCancel = {
-                            trajectoryPoints = FloatArray(0)
-                        }
+                        onDragEnd = { viewModel.onDragEnd() },
+                        onDragCancel = { }
                     )
                 }
         ) {
-            // Subscribe the draw phase to the frame clock so it redraws each frame.
             @Suppress("UNUSED_EXPRESSION")
             frameTick
             with(GameRenderer) {
                 renderGame(
                     engine = engine,
-                    trajectoryPoints = trajectoryPoints,
+                    trajectoryPoints = engine.getTrajectoryPoints(),
                     showTrajectory = uiState.showTrajectory,
-                    isDark = isDarkTheme,
-                    textMeasurer = textMeasurer
-                )
-                renderHud(
-                    score = engine.score,
-                    bestScore = engine.bestScore,
-                    round = engine.round,
-                    totalBalls = engine.totalBalls,
-                    coins = engine.coinsThisSession,
-                    timeRemaining = if (engine.config.mode == GameMode.TIME_ATTACK)
-                        engine.timeAttackRemaining else null,
                     isDark = isDarkTheme,
                     textMeasurer = textMeasurer
                 )
             }
         }
+
+        GameHud(
+            score = uiState.score,
+            bestScore = engine.bestScore,
+            round = uiState.round,
+            totalBalls = uiState.totalBalls,
+            coins = uiState.coins,
+            timeRemaining = uiState.timeRemaining,
+            modifier = Modifier.align(Alignment.TopStart)
+        )
 
         FloatingActionButton(
             onClick = {

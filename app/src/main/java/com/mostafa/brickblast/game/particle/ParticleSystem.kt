@@ -34,15 +34,21 @@ class Particle {
 /**
  * Object-pooled particle system for brick destruction, bounces, and collectables.
  */
-class ParticleSystem(poolSize: Int = 512) {
+class ParticleSystem(poolSize: Int = 256) {
     private val pool = Array(poolSize) { Particle() }
-    private var activeCount = 0
+    private val activeIndices = IntArray(poolSize)
+    private var activeListSize = 0
 
-    val particles: Array<Particle> get() = pool
+    fun forEachActive(block: (Particle) -> Unit) {
+        for (i in 0 until activeListSize) {
+            block(pool[activeIndices[i]])
+        }
+    }
 
-    fun emitExplosion(x: Float, y: Float, color: Color, count: Int = 16) {
+    fun emitExplosion(x: Float, y: Float, color: Color, count: Int = 8) {
         repeat(count) {
-            val p = acquire() ?: return@repeat
+            val index = acquireIndex() ?: return@repeat
+            val p = pool[index]
             val angle = Random.nextFloat() * 6.28f
             val speed = Random.nextFloat() * 300f + 100f
             p.x = x; p.y = y
@@ -57,9 +63,10 @@ class ParticleSystem(poolSize: Int = 512) {
         }
     }
 
-    fun emitSpark(x: Float, y: Float, count: Int = 4) {
+    fun emitSpark(x: Float, y: Float, count: Int = 2) {
         repeat(count) {
-            val p = acquire() ?: return@repeat
+            val index = acquireIndex() ?: return@repeat
+            val p = pool[index]
             val angle = Random.nextFloat() * 6.28f
             val speed = Random.nextFloat() * 200f + 50f
             p.x = x; p.y = y
@@ -74,9 +81,10 @@ class ParticleSystem(poolSize: Int = 512) {
         }
     }
 
-    fun emitGlowBurst(x: Float, y: Float, color: Color, count: Int = 12) {
+    fun emitGlowBurst(x: Float, y: Float, color: Color, count: Int = 8) {
         repeat(count) {
-            val p = acquire() ?: return@repeat
+            val index = acquireIndex() ?: return@repeat
+            val p = pool[index]
             val angle = Random.nextFloat() * 6.28f
             val speed = Random.nextFloat() * 150f + 30f
             p.x = x; p.y = y
@@ -92,9 +100,10 @@ class ParticleSystem(poolSize: Int = 512) {
     }
 
     fun update(deltaTime: Float) {
-        activeCount = 0
-        for (p in pool) {
-            if (!p.active) continue
+        var write = 0
+        for (i in 0 until activeListSize) {
+            val index = activeIndices[i]
+            val p = pool[index]
             p.life += deltaTime
             if (p.life >= p.maxLife) {
                 p.active = false
@@ -102,20 +111,26 @@ class ParticleSystem(poolSize: Int = 512) {
             }
             p.x += p.vx * deltaTime
             p.y += p.vy * deltaTime
-            p.vy += 400f * deltaTime // gravity for explosion particles
-            activeCount++
+            p.vy += 400f * deltaTime
+            activeIndices[write++] = index
         }
+        activeListSize = write
     }
 
-    private fun acquire(): Particle? {
-        for (p in pool) {
-            if (!p.active) return p
+    private fun acquireIndex(): Int? {
+        for (i in pool.indices) {
+            if (!pool[i].active) {
+                activeIndices[activeListSize++] = i
+                return i
+            }
         }
-        return null // pool exhausted
+        return null
     }
 
     fun clear() {
-        pool.forEach { it.active = false }
-        activeCount = 0
+        for (i in 0 until activeListSize) {
+            pool[activeIndices[i]].active = false
+        }
+        activeListSize = 0
     }
 }
