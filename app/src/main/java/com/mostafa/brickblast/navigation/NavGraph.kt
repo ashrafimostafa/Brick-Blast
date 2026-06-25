@@ -91,7 +91,9 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                     }
                 },
                 onVictory = { score, round ->
-                    navController.navigate(VictoryRoute(score, round, route.mode)) {
+                    navController.navigate(
+                        VictoryRoute(score, round, route.mode, route.challengeLevel)
+                    ) {
                         popUpTo<GameRoute> { inclusive = true }
                     }
                 },
@@ -144,7 +146,17 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 score = route.score,
                 round = route.round,
                 mode = route.mode,
-                onRetry = { navController.navigate(GameRoute(route.mode)) { popUpTo(MainMenuRoute) } },
+                challengeLevel = route.challengeLevel,
+                onRetry = {
+                    navController.navigate(
+                        GameRoute(route.mode, route.challengeLevel)
+                    ) { popUpTo(MainMenuRoute) }
+                },
+                onNextLevel = {
+                    navController.navigate(
+                        GameRoute("CHALLENGE", route.challengeLevel + 1)
+                    ) { popUpTo(MainMenuRoute) }
+                },
                 onBack = { navController.popBackStack(MainMenuRoute, inclusive = false) }
             )
         }

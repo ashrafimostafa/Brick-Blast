@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.domain.model.ChallengeConfig
 import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
 import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.components.GameButton
@@ -97,19 +98,26 @@ fun VictoryScreen(
     score: Int,
     round: Int,
     mode: String,
+    challengeLevel: Int = 1,
     onRetry: () -> Unit,
+    onNextLevel: (() -> Unit)? = null,
     onBack: () -> Unit
 ) {
+    val isChallenge = mode == "CHALLENGE"
+    val hasNextLevel = isChallenge && challengeLevel < ChallengeConfig.TOTAL_LEVELS
+
     EndGameScreen(
         title = "Victory!",
-        subtitle = "Completed round $round",
+        subtitle = if (isChallenge) "Level $challengeLevel complete" else "Completed round $round",
         score = score,
         roundReached = round,
         mode = mode,
         onRetry = onRetry,
         onBack = onBack,
         showShare = false,
-        titleColor = Color(0xFF69F0AE)
+        titleColor = Color(0xFF69F0AE),
+        nextButtonText = if (hasNextLevel) "Next Level" else null,
+        onNextLevel = if (hasNextLevel) onNextLevel else null
     )
 }
 
@@ -123,7 +131,9 @@ private fun EndGameScreen(
     onRetry: () -> Unit,
     onBack: () -> Unit,
     showShare: Boolean,
-    titleColor: Color
+    titleColor: Color,
+    nextButtonText: String? = null,
+    onNextLevel: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
@@ -194,7 +204,16 @@ private fun EndGameScreen(
                 modifier = Modifier.padding(bottom = 40.dp)
             )
 
-            GameButton(text = "Play Again", onClick = onRetry)
+            if (nextButtonText != null && onNextLevel != null) {
+                GameButton(text = nextButtonText, onClick = onNextLevel)
+                SecondaryButton(
+                    text = "Play Again",
+                    onClick = onRetry,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            } else {
+                GameButton(text = "Play Again", onClick = onRetry)
+            }
             SecondaryButton(
                 text = "Back",
                 onClick = onBack,
