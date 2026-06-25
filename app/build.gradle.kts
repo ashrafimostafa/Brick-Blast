@@ -20,6 +20,16 @@ val keystoreProperties = Properties().apply {
     }
 }
 
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties().apply {
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
+}
+
+fun localProp(key: String, default: String = ""): String =
+    localProperties.getProperty(key) ?: default
+
 fun signingValue(propKey: String, envKey: String): String? =
     (keystoreProperties[propKey] as String?) ?: System.getenv(envKey)
 
@@ -37,6 +47,31 @@ android {
         versionCode = 2
         versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("fdroid") {
+            dimension = "distribution"
+            buildConfigField("boolean", "ADS_ENABLED", "false")
+            buildConfigField("String", "TAPSELL_APP_KEY", "\"\"")
+            buildConfigField("String", "TAPSELL_REWARDED_ZONE_ID", "\"\"")
+        }
+        create("store") {
+            dimension = "distribution"
+            buildConfigField("boolean", "ADS_ENABLED", "true")
+            buildConfigField(
+                "String",
+                "TAPSELL_APP_KEY",
+                "\"${localProp("TAPSELL_APP_KEY")}\""
+            )
+            buildConfigField(
+                "String",
+                "TAPSELL_REWARDED_ZONE_ID",
+                "\"${localProp("TAPSELL_REWARDED_ZONE_ID")}\""
+            )
+            proguardFile("src/store/proguard-rules-store.pro")
+        }
     }
 
     signingConfigs {
@@ -85,6 +120,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -129,4 +165,7 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Store flavor only: Tapsell Plus (rewarded video). Not included in fdroid builds.
+    "storeImplementation"("ir.tapsell.plus:tapsell-plus-sdk-android:2.3.2")
 }

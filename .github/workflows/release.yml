@@ -51,12 +51,12 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleStoreRelease --no-daemon
 
       - name: Rename APK
         run: |
           mkdir -p artifacts
-          cp app/build/outputs/apk/release/app-release.apk \
+          cp app/build/outputs/apk/store/release/app-store-release.apk \
              "artifacts/BrickBlast-${GITHUB_REF_NAME}.apk"
 
       - name: Upload APK artifact

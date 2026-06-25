@@ -1,7 +1,10 @@
 package com.mostafa.brickblast.ui.viewmodel
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mostafa.brickblast.BuildConfig
+import com.mostafa.brickblast.ads.RewardedAdProvider
 import com.mostafa.brickblast.domain.model.Achievement
 import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.model.GameConfig
@@ -41,9 +44,8 @@ data class GameUiState(
     val newAchievements: List<Achievement> = emptyList(),
     val screenWidth: Float = 1080f,
     val screenHeight: Float = 1920f,
-    // Monotonic per-frame counter. Forces StateFlow to emit every frame so the
-    // Canvas redraws even when score/phase are unchanged (e.g. a ball flying
-    // through empty space). Without this the render would appear frozen.
+    val showContinueOffer: Boolean = false,
+    val continueAdLoading: Boolean = false,
     val frame: Long = 0
 )
 
@@ -55,7 +57,8 @@ class GameViewModel @Inject constructor(
     private val highScoreRepository: HighScoreRepository,
     private val settingsRepository: SettingsRepository,
     private val challengeRepository: ChallengeRepository,
-    private val audioManager: AudioManager
+    private val audioManager: AudioManager,
+    private val rewardedAdProvider: RewardedAdProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GameUiState())
@@ -68,6 +71,7 @@ class GameViewModel @Inject constructor(
     private var gameEndHandled = false
     private var totalCoins = 0L
     private var lastBounceSoundMs = 0L
+    private var continueUsedThisGame = false
 
     fun startGame(mode: GameMode, challengeLevel: Int = 1, continueGame: Boolean = false) {
         val restarting = engine.phase == GamePhase.GAME_OVER || engine.phase == GamePhase.VICTORY
@@ -81,10 +85,17 @@ class GameViewModel @Inject constructor(
 
         gameStarted = true
         gameEndHandled = false
+        continueUsedThisGame = false
         running = false
         // Clear end-state immediately so GameScreen does not bounce back to GameOver
         // before the async init finishes (reused ViewModel + singleton engine).
-        _uiState.update { it.copy(phase = GamePhase.AIMING) }
+        _uiState.update {
+            it.copy(
+                phase = GamePhase.AIMING,
+                showContinueOffer = false,
+                continueAdLoading = false
+            )
+        }
 
         viewModelScope.launch {
             val upgrades = playerRepository.getUpgrades()
@@ -130,9 +141,7 @@ class GameViewModel @Inject constructor(
             }
             engine.onCollect = { audioManager.play(SoundEffect.COLLECT) }
             engine.onShoot = { audioManager.play(SoundEffect.SHOOT) }
-            engine.onGameOver = {
-                viewModelScope.launch { handleGameEnd(isVictory = false) }
-            }
+            engine.onGameOver = { /* handled in tick() — may show continue-offer first */ }
             engine.onRoundComplete = { r ->
                 viewModelScope.launch {
                     autoSave()
@@ -160,6 +169,12 @@ class GameViewModel @Inject constructor(
             }
 
             running = true
+        }
+    }
+
+    fun preloadRewardedAd(activity: Activity) {
+        if (BuildConfig.ADS_ENABLED) {
+            rewardedAdProvider.preloadRewardedAd(activity)
         }
     }
 
@@ -206,7 +221,18 @@ class GameViewModel @Inject constructor(
 
         if (engine.phase == GamePhase.GAME_OVER) {
             running = false
-            viewModelScope.launch { handleGameEnd(isVictory = false) }
+            if (BuildConfig.ADS_ENABLED && !continueUsedThisGame && !gameEndHandled) {
+                if (!_uiState.value.showContinueOffer) {
+                    _uiState.update {
+                        it.copy(
+                            showContinueOffer = true,
+                            phase = GamePhase.GAME_OVER
+                        )
+                    }
+                }
+            } else if (!gameEndHandled) {
+                viewModelScope.launch { handleGameEnd(isVictory = false) }
+            }
         }
         if (engine.phase == GamePhase.VICTORY) {
             running = false
@@ -302,6 +328,43 @@ class GameViewModel @Inject constructor(
 
     fun dismissAchievement() {
         _uiState.update { it.copy(newAchievements = emptyList()) }
+    }
+
+    fun watchAdToContinue(activity: Activity) {
+        if (!BuildConfig.ADS_ENABLED || continueUsedThisGame) return
+        _uiState.update { it.copy(continueAdLoading = true) }
+        rewardedAdProvider.showRewardedAd(
+            activity = activity,
+            onRewarded = {
+                continueUsedThisGame = true
+                engine.continueAfterRewardedAd(5)
+                running = true
+                gameEndHandled = false
+                _uiState.update {
+                    it.copy(
+                        showContinueOffer = false,
+                        continueAdLoading = false,
+                        phase = GamePhase.AIMING,
+                        score = engine.score,
+                        round = engine.round,
+                        totalBalls = engine.totalBalls,
+                        coins = engine.coinsThisSession
+                    )
+                }
+            },
+            onClosed = {
+                _uiState.update { it.copy(continueAdLoading = false) }
+            },
+            onFailed = {
+                _uiState.update { it.copy(continueAdLoading = false) }
+            }
+        )
+    }
+
+    fun declineContinueOffer() {
+        if (gameEndHandled) return
+        _uiState.update { it.copy(showContinueOffer = false, continueAdLoading = false) }
+        viewModelScope.launch { handleGameEnd(isVictory = false) }
     }
 
     override fun onCleared() {

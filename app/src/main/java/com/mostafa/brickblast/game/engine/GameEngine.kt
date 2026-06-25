@@ -565,6 +565,41 @@ class GameEngine {
         onRoundComplete?.invoke(round)
     }
 
+    /**
+     * Rewarded-ad continue: clear the bottom [rowCount] brick rows and resume play.
+     * Called when the player watches an ad after losing (store flavor).
+     */
+    fun continueAfterRewardedAd(rowCount: Int = 5): Boolean {
+        if (phase != GamePhase.GAME_OVER) return false
+
+        removeBottomBrickRows(rowCount)
+        isAiming = false
+        physics.resetAccumulator()
+        resetBallsForAim()
+        phase = GamePhase.AIMING
+        return true
+    }
+
+    private fun removeBottomBrickRows(rowCount: Int) {
+        if (rowCount <= 0) return
+        val rowStep = brickHeight + 6f
+        if (rowStep <= 0f) return
+
+        val rowKeys = bricks
+            .asSequence()
+            .filter { it.hp > 0 && !it.isDestroying }
+            .map { kotlin.math.round(it.y / rowStep).toLong() }
+            .distinct()
+            .sortedDescending()
+            .take(rowCount)
+            .toSet()
+
+        if (rowKeys.isEmpty()) return
+        bricks.removeAll { brick ->
+            brick.hp > 0 && kotlin.math.round(brick.y / rowStep).toLong() in rowKeys
+        }
+    }
+
     private fun updateLauncherAnimation(deltaTime: Float) {
         if (!launcherAnimating) return
         launcherAnimT += deltaTime / LAUNCHER_ANIM_DURATION

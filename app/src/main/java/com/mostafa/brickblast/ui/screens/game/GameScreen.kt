@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -52,12 +53,23 @@ fun GameScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val engine = viewModel.gameEngine
+    val activity = LocalContext.current as? android.app.Activity
     val isDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val textMeasurer = rememberTextMeasurer(cacheSize = 128)
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var frameTick by remember { mutableIntStateOf(0) }
     var lastReportedPhase by remember(mode, challengeLevel, continueGame) {
         mutableStateOf<GamePhase?>(null)
+    }
+
+    LaunchedEffect(uiState.showContinueOffer, activity) {
+        if (uiState.showContinueOffer) {
+            activity?.let { viewModel.preloadRewardedAd(it) }
+        }
+    }
+
+    LaunchedEffect(activity) {
+        activity?.let { viewModel.preloadRewardedAd(it) }
     }
 
     LaunchedEffect(canvasSize, mode, challengeLevel, continueGame) {
@@ -82,7 +94,8 @@ fun GameScreen(
         }
     }
 
-    LaunchedEffect(uiState.phase) {
+    LaunchedEffect(uiState.phase, uiState.showContinueOffer) {
+        if (uiState.showContinueOffer) return@LaunchedEffect
         val previous = lastReportedPhase
         lastReportedPhase = uiState.phase
         if (previous == null) return@LaunchedEffect
@@ -173,6 +186,17 @@ fun GameScreen(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .padding(top = 100.dp)
+            )
+        }
+
+        if (uiState.showContinueOffer) {
+            ContinueOfferOverlay(
+                loading = uiState.continueAdLoading,
+                onWatchAd = {
+                    activity?.let { viewModel.watchAdToContinue(it) }
+                },
+                onGiveUp = { viewModel.declineContinueOffer() },
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }

@@ -1,0 +1,4 @@
+# Copy to local.properties (not committed) for store-flavor Tapsell ads.
+# Get keys from https://panel.tapsell.ir
+TAPSELL_APP_KEY=test
+TAPSELL_REWARDED_ZONE_ID=test

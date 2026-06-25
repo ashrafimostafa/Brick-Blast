@@ -28,7 +28,7 @@ Builds:
     # mavenCentral() remain as the resolving repositories.
     prebuild: sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts
     gradle:
-      - yes
+      - fdroidRelease
 
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
