@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,6 +9,22 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
 }
+
+// Release signing is configured from a local keystore.properties file (for local
+// release builds) or from environment variables (for CI). Neither the keystore
+// nor its passwords are committed to the repository.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        load(FileInputStream(keystorePropertiesFile))
+    }
+}
+
+fun signingValue(propKey: String, envKey: String): String? =
+    (keystoreProperties[propKey] as String?) ?: System.getenv(envKey)
+
+val releaseStoreFilePath = signingValue("storeFile", "KEYSTORE_FILE")
+val hasReleaseSigning = releaseStoreFilePath != null
 
 android {
     namespace = "com.mostafa.brickblast"
@@ -20,6 +39,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFilePath!!)
+                storePassword = signingValue("storePassword", "KEYSTORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -27,6 +57,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Use the release keystore when available (local or CI); otherwise the
+            // build still completes unsigned so contributors without the key can build.
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                null
+            }
         }
     }
 
