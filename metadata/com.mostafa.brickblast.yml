@@ -10,13 +10,13 @@ Categories:
   - Games
 License: MIT
 AuthorName: Mostafa
-SourceCode: https://github.com/mostafa/BrickBlast
-IssueTracker: https://github.com/mostafa/BrickBlast/issues
+SourceCode: https://github.com/ashrafimostafa/Brick-Blast
+IssueTracker: https://github.com/ashrafimostafa/Brick-Blast/issues
 
 AutoName: Brick Blast
 
 RepoType: git
-Repo: https://github.com/mostafa/BrickBlast.git
+Repo: https://github.com/ashrafimostafa/Brick-Blast.git
 
 Builds:
   - versionName: 1.0.0
