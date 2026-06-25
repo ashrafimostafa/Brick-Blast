@@ -51,6 +51,8 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          TAPSELL_APP_KEY: ${{ secrets.TAPSELL_APP_KEY }}
+          TAPSELL_REWARDED_ZONE_ID: ${{ secrets.TAPSELL_REWARDED_ZONE_ID }}
         run: ./gradlew assembleStoreRelease --no-daemon
 
       - name: Rename APK

@@ -27,8 +27,10 @@ val localProperties = Properties().apply {
     }
 }
 
+// Reads a config value from local.properties first (local dev), then falls back
+// to an environment variable of the same name (CI / GitHub Actions secrets).
 fun localProp(key: String, default: String = ""): String =
-    localProperties.getProperty(key) ?: default
+    localProperties.getProperty(key) ?: System.getenv(key) ?: default
 
 fun signingValue(propKey: String, envKey: String): String? =
     (keystoreProperties[propKey] as String?) ?: System.getenv(envKey)
