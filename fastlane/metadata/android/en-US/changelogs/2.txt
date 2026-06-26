@@ -1,0 +1,1 @@
+* Fixed a crash on the optimized release build

@@ -1,0 +1,5 @@
+* Bigger, easier-to-see balls
+* Smoother performance and reduced lag
+* Fixed "Play Again" needing two taps after a loss
+* Accessibility improvements for screen readers
+* Stability fixes
