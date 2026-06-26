@@ -6,7 +6,7 @@
 # A signed git tag "v1.1.1" must exist in the repo for the build below.
 
 Categories:
-  - Games
+  - Casual Game
 License: MIT
 AuthorName: Mostafa Ashrafi
 AuthorEmail: ashrafimostafa@gmail.com
