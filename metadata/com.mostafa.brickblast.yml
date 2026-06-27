@@ -21,7 +21,7 @@ Builds:
     prebuild: sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts && sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@'
       ../gradle/wrapper/gradle-wrapper.properties
 
-AutoUpdateMode: Version v%v
+AutoUpdateMode: Version
 UpdateCheckMode: Tags
 CurrentVersion: 1.1.1
 CurrentVersionCode: 4
