@@ -13,15 +13,6 @@ Repo: https://github.com/ashrafimostafa/Brick-Blast.git
 Binaries: https://github.com/ashrafimostafa/Brick-Blast/releases/download/v%v/BrickBlast-%v-fdroid.apk
 
 Builds:
-  - versionName: 1.1.1
-    versionCode: 4
-    commit: e8244d7ea64bb07b425fce2bc61a67a97ae58edf
-    subdir: app
-    gradle:
-      - fdroid
-    prebuild:
-      - sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts
-      - sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@' ../gradle/wrapper/gradle-wrapper.properties
   - versionName: 1.2.0
     versionCode: 5
     commit: 181315ae6187a1a18c93b7bfc4502b8261cb8455
