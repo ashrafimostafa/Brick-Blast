@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.keystore"
 
-      - name: Build signed release APK
+      - name: Build signed release APKs
         env:
           KEYSTORE_FILE: ${{ runner.temp }}/release.keystore
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -53,13 +53,16 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           TAPSELL_APP_KEY: ${{ secrets.TAPSELL_APP_KEY }}
           TAPSELL_REWARDED_ZONE_ID: ${{ secrets.TAPSELL_REWARDED_ZONE_ID }}
-        run: ./gradlew assembleStoreRelease --no-daemon
+        run: ./gradlew assembleFdroidRelease assembleStoreRelease --no-daemon
 
-      - name: Rename APK
+      - name: Rename APKs
         run: |
+          VERSION="${GITHUB_REF_NAME#v}"
           mkdir -p artifacts
+          cp app/build/outputs/apk/fdroid/release/app-fdroid-release.apk \
+             "artifacts/BrickBlast-${VERSION}-fdroid.apk"
           cp app/build/outputs/apk/store/release/app-store-release.apk \
-             "artifacts/BrickBlast-${GITHUB_REF_NAME}.apk"
+             "artifacts/BrickBlast-${VERSION}-store.apk"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.0
+
+- F-Droid reproducible build support (developer-signed fdroid APK on GitHub Releases)
+- Separate fdroid and store release artifacts in CI
+- F-Droid metadata and category updates
+
 ## v1.1.1
 
 - Fix ad in ci

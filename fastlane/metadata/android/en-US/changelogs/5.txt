@@ -1,0 +1,3 @@
+* F-Droid reproducible build verification
+* Improved release build pipeline
+* Bug fixes and stability improvements
