@@ -21,7 +21,7 @@ Repo: https://github.com/ashrafimostafa/Brick-Blast.git
 Builds:
   - versionName: 1.1.1
     versionCode: 4
-    commit: v1.1.1
+    commit: e8244d7ea64bb07b425fce2bc61a67a97ae58edf
     subdir: app
     # The project ships two flavors: "fdroid" (FOSS, no ads, no network) and
     # "store" (Tapsell ads). F-Droid must build the "fdroid" flavor only.
