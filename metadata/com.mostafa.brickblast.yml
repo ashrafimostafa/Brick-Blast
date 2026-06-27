@@ -18,8 +18,9 @@ Builds:
     subdir: app
     gradle:
       - fdroid
-    prebuild: sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts && sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@'
-      ../gradle/wrapper/gradle-wrapper.properties
+    prebuild:
+      - sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts
+      - sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@' ../gradle/wrapper/gradle-wrapper.properties
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
