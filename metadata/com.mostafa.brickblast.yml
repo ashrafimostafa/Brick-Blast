@@ -10,7 +10,8 @@ AutoName: Brick Blast
 
 RepoType: git
 Repo: https://github.com/ashrafimostafa/Brick-Blast.git
-Binaries: https://github.com/ashrafimostafa/Brick-Blast/releases/download/v%v/BrickBlast-%v-fdroid.apk
+Binaries: 
+  https://github.com/ashrafimostafa/Brick-Blast/releases/download/v%v/BrickBlast-%v-fdroid.apk
 
 Builds:
   - versionName: 1.2.0
@@ -21,10 +22,12 @@ Builds:
       - fdroid
     prebuild:
       - sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts
-      - sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@' ../gradle/wrapper/gradle-wrapper.properties
+      - sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@'
+        ../gradle/wrapper/gradle-wrapper.properties
+
+AllowedAPKSigningKeys: c8075d7ffe193cc213bc38404816bb8dacf247f4c0e3e23e8a400d84f8ccde9f
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-AllowedAPKSigningKeys: c8075d7ffe193cc213bc38404816bb8dacf247f4c0e3e23e8a400d84f8ccde9f
 CurrentVersion: 1.2.0
 CurrentVersionCode: 5
