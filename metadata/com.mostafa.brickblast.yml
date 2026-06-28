@@ -15,7 +15,7 @@ Binaries: https://github.com/ashrafimostafa/Brick-Blast/releases/download/v%v/Br
 Builds:
   - versionName: 1.2.0
     versionCode: 5
-    commit: 181315ae6187a1a18c93b7bfc4502b8261cb8455
+    commit: ac3b4e7d72e0dd0d3de7548d61cf2b296910fc66
     subdir: app
     gradle:
       - fdroid
