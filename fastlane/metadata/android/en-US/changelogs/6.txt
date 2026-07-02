@@ -1,0 +1,1 @@
+Persian language with Vazir font; fix language setting; separate saves per game mode; smoother performance; harder difficulty.

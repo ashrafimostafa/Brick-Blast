@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.3.0
+
+- Persian (Farsi) UI with Vazir font for menus, settings, and in-game text
+- Fix language switch in Settings (persists correctly and applies on restart)
+- Separate save slots per game mode (Classic, Hardcore, Challenge, Time Attack)
+- Full board restore when continuing a saved game
+- Smoother gameplay (Choreographer game loop, rendering optimizations)
+- Harder difficulty curve (brick HP, ball pickups, lose line)
+- Performance improvements for high ball counts
+
 ## v1.2.0
 
 - F-Droid reproducible build support (developer-signed fdroid APK on GitHub Releases)
