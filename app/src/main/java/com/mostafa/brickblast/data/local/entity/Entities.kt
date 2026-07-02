@@ -51,12 +51,17 @@ data class PlayerWalletEntity(
 
 @Entity(tableName = "game_save")
 data class GameSaveEntity(
-    @PrimaryKey val id: Int = 1,
+    @PrimaryKey val saveKey: String,
     val round: Int = 1,
     val score: Int = 0,
     val totalBalls: Int = 1,
     val coinsThisSession: Int = 0,
     val mode: String = "CLASSIC",
+    val challengeLevel: Int = 1,
+    val timeAttackRemaining: Float = 0f,
+    val launcherX: Float = 540f,
+    val nextLauncherX: Float = 540f,
+    val hasNextLauncher: Boolean = false,
     val bricksJson: String = "",
     val collectablesJson: String = "",
     val timestamp: Long = System.currentTimeMillis(),

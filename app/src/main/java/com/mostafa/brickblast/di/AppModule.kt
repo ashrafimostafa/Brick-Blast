@@ -81,5 +81,5 @@ object GameModule {
 
     @Provides
     @Singleton
-    fun provideGameEngine(): GameEngine = GameEngine()
+    fun provideGameEngine(@ApplicationContext context: Context): GameEngine = GameEngine(context)
 }

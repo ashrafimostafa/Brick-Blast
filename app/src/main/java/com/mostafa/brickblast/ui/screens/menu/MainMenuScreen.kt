@@ -12,10 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.components.SecondaryButton
@@ -42,7 +43,7 @@ fun MainMenuScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "BRICK BLAST",
+            text = stringResource(R.string.title_brick_blast),
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = titleColor,
@@ -51,19 +52,19 @@ fun MainMenuScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         if (hasActiveSave) {
-            GameButton(text = "Continue", onClick = onContinue)
+            GameButton(text = stringResource(R.string.menu_continue), onClick = onContinue)
             Spacer(modifier = Modifier.height(12.dp))
         }
-        GameButton(text = "Play", onClick = onPlay)
+        GameButton(text = stringResource(R.string.menu_play), onClick = onPlay)
         Spacer(modifier = Modifier.height(12.dp))
-        SecondaryButton(text = "Challenge", onClick = onChallenge)
+        SecondaryButton(text = stringResource(R.string.menu_challenge), onClick = onChallenge)
         Spacer(modifier = Modifier.height(12.dp))
-        SecondaryButton(text = "Time Attack", onClick = onTimeAttack)
+        SecondaryButton(text = stringResource(R.string.menu_time_attack), onClick = onTimeAttack)
         Spacer(modifier = Modifier.height(12.dp))
-        SecondaryButton(text = "Hardcore", onClick = onHardcore)
+        SecondaryButton(text = stringResource(R.string.menu_hardcore), onClick = onHardcore)
         Spacer(modifier = Modifier.height(12.dp))
-        SecondaryButton(text = "Statistics", onClick = onStatistics)
+        SecondaryButton(text = stringResource(R.string.menu_statistics), onClick = onStatistics)
         Spacer(modifier = Modifier.height(12.dp))
-        SecondaryButton(text = "Settings", onClick = onSettings)
+        SecondaryButton(text = stringResource(R.string.menu_settings), onClick = onSettings)
     }
 }

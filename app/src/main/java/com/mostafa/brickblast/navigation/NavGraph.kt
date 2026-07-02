@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -28,6 +29,7 @@ import com.mostafa.brickblast.ui.screens.statistics.StatisticsScreen
 import com.mostafa.brickblast.ui.screens.upgrade.UpgradeScreen
 import com.mostafa.brickblast.ui.viewmodel.GameViewModel
 import com.mostafa.brickblast.ui.viewmodel.MenuViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun BrickBlastNavGraph(navController: NavHostController) {
@@ -51,6 +53,7 @@ fun BrickBlastNavGraph(navController: NavHostController) {
         composable<MainMenuRoute> {
             val vm: MenuViewModel = hiltViewModel()
             val hasSave by vm.hasActiveSave.collectAsState()
+            val scope = rememberCoroutineScope()
             MainMenuScreen(
                 hasActiveSave = hasSave,
                 onPlay = { navController.navigate(GameRoute(mode = "CLASSIC")) },
@@ -59,7 +62,18 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 onHardcore = { navController.navigate(GameRoute(mode = "HARDCORE")) },
                 onSettings = { navController.navigate(SettingsRoute) },
                 onStatistics = { navController.navigate(StatisticsRoute) },
-                onContinue = { navController.navigate(GameRoute(mode = "CLASSIC", continueGame = true)) }
+                onContinue = {
+                    scope.launch {
+                        val save = vm.getRecentSave() ?: return@launch
+                        navController.navigate(
+                            GameRoute(
+                                mode = save.mode.name,
+                                challengeLevel = save.challengeLevel,
+                                continueGame = true
+                            )
+                        )
+                    }
+                }
             )
         }
 

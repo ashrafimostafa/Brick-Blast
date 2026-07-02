@@ -24,7 +24,7 @@ import com.mostafa.brickblast.data.local.entity.PlayerWalletEntity
         PlayerWalletEntity::class,
         GameSaveEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class BrickBlastDatabase : RoomDatabase() {

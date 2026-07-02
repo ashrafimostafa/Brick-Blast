@@ -2,6 +2,7 @@ package com.mostafa.brickblast.domain.repository
 
 import com.mostafa.brickblast.domain.model.Achievement
 import com.mostafa.brickblast.domain.model.AppSettings
+import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GameSaveState
 import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
@@ -37,8 +38,9 @@ interface PlayerRepository {
 
 interface GameSaveRepository {
     suspend fun saveGame(state: GameSaveState)
-    suspend fun loadGame(): GameSaveState?
-    suspend fun clearSave()
+    suspend fun loadGame(mode: GameMode): GameSaveState?
+    suspend fun clearSave(mode: GameMode)
+    suspend fun getMostRecentSave(): GameSaveState?
     fun hasActiveSave(): Flow<Boolean>
 }
 

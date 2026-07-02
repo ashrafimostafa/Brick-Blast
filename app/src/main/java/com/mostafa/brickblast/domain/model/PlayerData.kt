@@ -60,6 +60,11 @@ data class GameSaveState(
     val totalBalls: Int = 1,
     val coinsThisSession: Int = 0,
     val mode: GameMode = GameMode.CLASSIC,
+    val challengeLevel: Int = 1,
+    val timeAttackRemaining: Float = 0f,
+    val launcherX: Float = 0f,
+    val nextLauncherX: Float = 0f,
+    val hasNextLauncher: Boolean = false,
     val bricksJson: String = "",
     val collectablesJson: String = "",
     val timestamp: Long = System.currentTimeMillis()
@@ -71,5 +76,7 @@ data class AppSettings(
     val vibrationEnabled: Boolean = true,
     val showTrajectory: Boolean = true,
     val particleEffects: Boolean = true,
-    val darkTheme: Boolean = true
+    val darkTheme: Boolean = true,
+    /** null = follow system language; otherwise BCP-47 tag such as "en" or "fa". */
+    val languageTag: String? = null
 )

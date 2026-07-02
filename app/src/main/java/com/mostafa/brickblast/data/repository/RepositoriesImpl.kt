@@ -8,6 +8,7 @@ import com.mostafa.brickblast.data.local.dao.HighScoreDao
 import com.mostafa.brickblast.data.local.dao.PlayerStatsDao
 import com.mostafa.brickblast.data.local.dao.PlayerUpgradesDao
 import com.mostafa.brickblast.data.local.dao.PlayerWalletDao
+import com.mostafa.brickblast.data.local.GameSaveSlots
 import com.mostafa.brickblast.data.local.entity.AchievementEntity
 import com.mostafa.brickblast.data.local.entity.GameSaveEntity
 import com.mostafa.brickblast.data.local.entity.HighScoreEntity
@@ -214,13 +215,20 @@ class GameSaveRepositoryImpl @Inject constructor(
 ) : GameSaveRepository {
 
     override suspend fun saveGame(state: GameSaveState) {
+        val key = GameSaveSlots.key(state.mode)
         gameSaveDao.upsert(
             GameSaveEntity(
+                saveKey = key,
                 round = state.round,
                 score = state.score,
                 totalBalls = state.totalBalls,
                 coinsThisSession = state.coinsThisSession,
                 mode = state.mode.name,
+                challengeLevel = state.challengeLevel,
+                timeAttackRemaining = state.timeAttackRemaining,
+                launcherX = state.launcherX,
+                nextLauncherX = state.nextLauncherX,
+                hasNextLauncher = state.hasNextLauncher,
                 bricksJson = state.bricksJson,
                 collectablesJson = state.collectablesJson,
                 timestamp = state.timestamp,
@@ -229,25 +237,40 @@ class GameSaveRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun loadGame(): GameSaveState? {
-        val entity = gameSaveDao.get() ?: return null
+    override suspend fun loadGame(mode: GameMode): GameSaveState? {
+        val entity = gameSaveDao.get(GameSaveSlots.key(mode)) ?: return null
         if (!entity.hasActiveSave) return null
-        return GameSaveState(
-            round = entity.round,
-            score = entity.score,
-            totalBalls = entity.totalBalls,
-            coinsThisSession = entity.coinsThisSession,
-            mode = GameMode.valueOf(entity.mode),
-            bricksJson = entity.bricksJson,
-            collectablesJson = entity.collectablesJson,
-            timestamp = entity.timestamp
-        )
+        return entity.toDomain()
     }
 
-    override suspend fun clearSave() = gameSaveDao.clear()
+    override suspend fun clearSave(mode: GameMode) {
+        gameSaveDao.clear(GameSaveSlots.key(mode))
+    }
+
+    override suspend fun getMostRecentSave(): GameSaveState? {
+        val entity = gameSaveDao.getMostRecent() ?: return null
+        if (!entity.hasActiveSave) return null
+        return entity.toDomain()
+    }
 
     override fun hasActiveSave(): Flow<Boolean> =
-        gameSaveDao.observe().map { it?.hasActiveSave == true }
+        gameSaveDao.observeActive().map { it.isNotEmpty() }
+
+    private fun GameSaveEntity.toDomain() = GameSaveState(
+        round = round,
+        score = score,
+        totalBalls = totalBalls,
+        coinsThisSession = coinsThisSession,
+        mode = GameMode.valueOf(mode),
+        challengeLevel = challengeLevel,
+        timeAttackRemaining = timeAttackRemaining,
+        launcherX = launcherX,
+        nextLauncherX = nextLauncherX,
+        hasNextLauncher = hasNextLauncher,
+        bricksJson = bricksJson,
+        collectablesJson = collectablesJson,
+        timestamp = timestamp
+    )
 }
 
 @Singleton

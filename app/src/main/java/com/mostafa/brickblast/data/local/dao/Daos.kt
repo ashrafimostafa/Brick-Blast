@@ -74,15 +74,18 @@ interface PlayerWalletDao {
 
 @Dao
 interface GameSaveDao {
-    @Query("SELECT * FROM game_save WHERE id = 1")
-    suspend fun get(): GameSaveEntity?
+    @Query("SELECT * FROM game_save WHERE saveKey = :saveKey")
+    suspend fun get(saveKey: String): GameSaveEntity?
 
-    @Query("SELECT * FROM game_save WHERE id = 1")
-    fun observe(): Flow<GameSaveEntity?>
+    @Query("SELECT * FROM game_save WHERE hasActiveSave = 1 ORDER BY timestamp DESC")
+    suspend fun getMostRecent(): GameSaveEntity?
+
+    @Query("SELECT * FROM game_save WHERE hasActiveSave = 1 ORDER BY timestamp DESC")
+    fun observeActive(): Flow<List<GameSaveEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(save: GameSaveEntity)
 
-    @Query("DELETE FROM game_save WHERE id = 1")
-    suspend fun clear()
+    @Query("DELETE FROM game_save WHERE saveKey = :saveKey")
+    suspend fun clear(saveKey: String)
 }
