@@ -10,8 +10,8 @@ import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.model.GameConfig
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GamePhase
+import com.mostafa.brickblast.data.local.GameStateSerializer
 import com.mostafa.brickblast.domain.model.GameSaveState
-import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
 import com.mostafa.brickblast.domain.repository.ChallengeRepository
@@ -68,9 +68,11 @@ class GameViewModel @Inject constructor(
 
     private var gameStarted = false
     @Volatile private var running = false
+    val isRunning: Boolean get() = running
     private var gameEndHandled = false
     private var totalCoins = 0L
     private var lastBounceSoundMs = 0L
+    private var lastHudUpdateNanos = 0L
     private var continueUsedThisGame = false
 
     fun startGame(mode: GameMode, challengeLevel: Int = 1, continueGame: Boolean = false) {
@@ -106,22 +108,21 @@ class GameViewModel @Inject constructor(
             audioManager.setMusicEnabled(settings.musicEnabled)
             if (settings.musicEnabled) audioManager.startMusic()
 
-            var restoredRound = 1
-            var restoredBalls = -1
-            var restoredScore = 0
+            var save: GameSaveState? = null
             if (continueGame) {
-                gameSaveRepository.loadGame()?.let { save ->
-                    restoredRound = save.round
-                    restoredBalls = save.totalBalls
-                    restoredScore = save.score
-                }
+                save = gameSaveRepository.loadGame(mode)?.takeIf { it.mode == mode }
             } else {
-                gameSaveRepository.clearSave()
+                gameSaveRepository.clearSave(mode)
+            }
+
+            val effectiveChallengeLevel = when {
+                save != null && mode == GameMode.CHALLENGE -> save.challengeLevel
+                else -> challengeLevel
             }
 
             val config = GameConfig(
                 mode = mode,
-                challengeLevel = challengeLevel,
+                challengeLevel = effectiveChallengeLevel,
                 timeLimitSeconds = if (mode == GameMode.TIME_ATTACK) 60 else 0
             )
 
@@ -152,7 +153,7 @@ class GameViewModel @Inject constructor(
 
             val w = _uiState.value.screenWidth
             val h = _uiState.value.screenHeight
-            engine.initGame(w, h, config, upgrades, restoredRound, restoredBalls, restoredScore)
+            engine.initGame(w, h, config, upgrades, save)
             engine.particleEffectsEnabled = settings.particleEffects
 
             _uiState.update {
@@ -198,15 +199,23 @@ class GameViewModel @Inject constructor(
         } else null
         val timeChanged = timeRemaining != null && (
             current.timeRemaining == null ||
-            timeRemaining.toInt() != current.timeRemaining!!.toInt()
+                timeRemaining.toInt() != current.timeRemaining!!.toInt()
         )
-        if (engine.phase != current.phase ||
-            engine.score != current.score ||
-            engine.round != current.round ||
-            engine.totalBalls != current.totalBalls ||
-            engine.coinsThisSession != current.coins ||
-            timeChanged
+        val phaseChanged = engine.phase != current.phase
+        val aimingChanged = engine.isAiming != current.isAiming
+        val ballsChanged = engine.totalBalls != current.totalBalls
+        val simulating = engine.phase == GamePhase.SIMULATING || engine.phase == GamePhase.LAUNCHING
+        val now = System.nanoTime()
+        val hudDue = !simulating || now - lastHudUpdateNanos >= 250_000_000L
+
+        if (phaseChanged || aimingChanged || ballsChanged || timeChanged ||
+            (hudDue && (
+                engine.score != current.score ||
+                    engine.round != current.round ||
+                    engine.coinsThisSession != current.coins
+                ))
         ) {
+            lastHudUpdateNanos = now
             _uiState.update {
                 it.copy(
                     phase = engine.phase,
@@ -214,7 +223,8 @@ class GameViewModel @Inject constructor(
                     round = engine.round,
                     totalBalls = engine.totalBalls,
                     coins = engine.coinsThisSession,
-                    timeRemaining = timeRemaining
+                    timeRemaining = timeRemaining,
+                    isAiming = engine.isAiming
                 )
             }
         }
@@ -240,13 +250,21 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun onDragStart(x: Float, y: Float) = engine.startAim(x, y)
+    fun onDragStart(x: Float, y: Float) {
+        engine.startAim(x, y)
+    }
+
     fun onDrag(x: Float, y: Float) = engine.updateAim(x, y)
-    fun onDragEnd() = engine.releaseAim()
+
+    fun onDragEnd() {
+        engine.releaseAim()
+        _uiState.update { it.copy(isAiming = engine.isAiming) }
+    }
 
     fun pause() {
         running = false
         engine.pause()
+        viewModelScope.launch { autoSave() }
     }
 
     fun resume() {
@@ -265,6 +283,7 @@ class GameViewModel @Inject constructor(
     }
 
     private suspend fun autoSave() {
+        if (engine.phase == GamePhase.GAME_OVER || engine.phase == GamePhase.VICTORY) return
         gameSaveRepository.saveGame(
             GameSaveState(
                 round = engine.round,
@@ -272,6 +291,13 @@ class GameViewModel @Inject constructor(
                 totalBalls = engine.totalBalls,
                 coinsThisSession = engine.coinsThisSession,
                 mode = engine.config.mode,
+                challengeLevel = engine.config.challengeLevel,
+                timeAttackRemaining = engine.timeAttackRemaining,
+                launcherX = engine.launcherX,
+                nextLauncherX = engine.nextLauncherX,
+                hasNextLauncher = engine.hasNextLauncher,
+                bricksJson = GameStateSerializer.serializeBricks(engine.bricks),
+                collectablesJson = GameStateSerializer.serializeCollectables(engine.collectables),
                 timestamp = System.currentTimeMillis()
             )
         )
@@ -285,7 +311,7 @@ class GameViewModel @Inject constructor(
         if (!isVictory) audioManager.play(SoundEffect.GAME_OVER)
         persistProgress()
         highScoreRepository.saveHighScore(engine.score, engine.round, engine.config.mode.name)
-        gameSaveRepository.clearSave()
+        gameSaveRepository.clearSave(engine.config.mode)
         if (isVictory && engine.config.mode == GameMode.CHALLENGE) {
             challengeRepository.completeLevel(engine.config.challengeLevel)
         }
@@ -337,7 +363,7 @@ class GameViewModel @Inject constructor(
             activity = activity,
             onRewarded = {
                 continueUsedThisGame = true
-                engine.continueAfterRewardedAd(5)
+                engine.continueAfterRewardedAd(3)
                 running = true
                 gameEndHandled = false
                 _uiState.update {
