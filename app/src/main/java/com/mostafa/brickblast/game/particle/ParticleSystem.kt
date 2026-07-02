@@ -37,7 +37,15 @@ class Particle {
 class ParticleSystem(poolSize: Int = 256) {
     private val pool = Array(poolSize) { Particle() }
     private val activeIndices = IntArray(poolSize)
+    private val freeIndices = IntArray(poolSize)
     private var activeListSize = 0
+    private var freeListSize = poolSize
+
+    init {
+        for (i in pool.indices) {
+            freeIndices[i] = i
+        }
+    }
 
     fun forEachActive(block: (Particle) -> Unit) {
         for (i in 0 until activeListSize) {
@@ -45,7 +53,7 @@ class ParticleSystem(poolSize: Int = 256) {
         }
     }
 
-    fun emitExplosion(x: Float, y: Float, color: Color, count: Int = 8) {
+    fun emitExplosion(x: Float, y: Float, color: Color, count: Int = 6) {
         repeat(count) {
             val index = acquireIndex() ?: return@repeat
             val p = pool[index]
@@ -81,7 +89,7 @@ class ParticleSystem(poolSize: Int = 256) {
         }
     }
 
-    fun emitGlowBurst(x: Float, y: Float, color: Color, count: Int = 8) {
+    fun emitGlowBurst(x: Float, y: Float, color: Color, count: Int = 6) {
         repeat(count) {
             val index = acquireIndex() ?: return@repeat
             val p = pool[index]
@@ -107,6 +115,7 @@ class ParticleSystem(poolSize: Int = 256) {
             p.life += deltaTime
             if (p.life >= p.maxLife) {
                 p.active = false
+                releaseIndex(index)
                 continue
             }
             p.x += p.vx * deltaTime
@@ -118,18 +127,21 @@ class ParticleSystem(poolSize: Int = 256) {
     }
 
     private fun acquireIndex(): Int? {
-        for (i in pool.indices) {
-            if (!pool[i].active) {
-                activeIndices[activeListSize++] = i
-                return i
-            }
-        }
-        return null
+        if (freeListSize == 0) return null
+        val index = freeIndices[--freeListSize]
+        activeIndices[activeListSize++] = index
+        return index
+    }
+
+    private fun releaseIndex(index: Int) {
+        freeIndices[freeListSize++] = index
     }
 
     fun clear() {
         for (i in 0 until activeListSize) {
-            pool[activeIndices[i]].active = false
+            val index = activeIndices[i]
+            pool[index].active = false
+            freeIndices[freeListSize++] = index
         }
         activeListSize = 0
     }

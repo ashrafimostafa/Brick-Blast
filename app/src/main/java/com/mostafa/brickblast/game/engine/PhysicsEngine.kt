@@ -3,7 +3,6 @@ package com.mostafa.brickblast.game.engine
 import com.mostafa.brickblast.domain.model.Ball
 import com.mostafa.brickblast.domain.model.Brick
 import com.mostafa.brickblast.domain.model.Collectable
-import com.mostafa.brickblast.domain.model.PowerUpType
 import kotlin.math.sqrt
 
 /**
@@ -11,46 +10,39 @@ import kotlin.math.sqrt
  * Uses delta-time accumulation and avoids allocations in the hot loop.
  */
 class PhysicsEngine(
-    private val spatialGrid: SpatialHashGrid = SpatialHashGrid()
+    private val spatialGrid: SpatialHashGrid = SpatialHashGrid(cellSize = 120f)
 ) {
     companion object {
         const val FIXED_DT = 1f / 60f
-        const val BALL_SPEED = 1200f
+        const val BALL_SPEED = 1320f
         const val MAX_SUBSTEPS = 3
 
-        // Minimum angle above horizontal (~12 degrees) for any launch.
         val MIN_ANGLE = Math.toRadians(12.0).toFloat()
     }
 
-    // Reusable buffers to avoid per-frame allocations in the hot loop.
-    private val nearbyBuffer = ArrayList<Brick>(16)
+    private val nearbyBuffer = ArrayList<Brick>(12)
     private val collisionScratch = CollisionScratch()
     private val bestCollision = CollisionScratch()
     private val wallNormalX = FloatArray(1)
     private val wallNormalY = FloatArray(1)
-    private val trajectoryBuffer = FloatArray(120)
+    private val trajectoryBuffer = FloatArray(80)
 
     var timeScale: Float = 1f
 
-    // Persistent across frames so leftover sub-frame time carries over. A local
-    // accumulator would stall when a frame's deltaTime is below FIXED_DT (e.g.
-    // a ~16ms frame vs a 16.667ms fixed step), leaving the ball frozen.
     private var accumulator = 0f
+    private var lastBrickLayoutGeneration = -1
 
-    /** Clear leftover simulation time, e.g. when a new shot begins. */
     fun resetAccumulator() {
         accumulator = 0f
     }
 
-    /**
-     * Advance simulation by deltaTime seconds using fixed substeps.
-     * Returns true while at least one launched ball is still in flight.
-     */
     fun update(
         balls: MutableList<Ball>,
         bricks: MutableList<Brick>,
         collectables: MutableList<Collectable>,
         bounds: GameBounds,
+        brickLayoutGeneration: Int,
+        activeBallCount: Int,
         onBrickHit: (Brick, Ball) -> Unit,
         onBrickDestroyed: (Brick) -> Unit,
         onBallBounce: (Ball) -> Unit,
@@ -59,73 +51,77 @@ class PhysicsEngine(
     ): Boolean {
         accumulator += deltaTime
 
-        // Rebuild once per frame, not once per sub-step.
-        rebuildSpatialGrid(bricks)
+        if (brickLayoutGeneration != lastBrickLayoutGeneration) {
+            rebuildSpatialGrid(bricks)
+            lastBrickLayoutGeneration = brickLayoutGeneration
+        }
+
+        val activeAtStart = activeBallCount
+        val maxSteps = when {
+            activeAtStart > 100 -> 1
+            activeAtStart > 60 -> 2
+            activeAtStart > 30 -> 2
+            else -> MAX_SUBSTEPS
+        }
 
         var steps = 0
-        while (accumulator >= FIXED_DT && steps < MAX_SUBSTEPS) {
+        while (accumulator >= FIXED_DT && steps < maxSteps) {
             accumulator -= FIXED_DT
             step(
-                balls, bricks, collectables, bounds,
+                balls, collectables, bounds, activeAtStart,
                 onBrickHit, onBrickDestroyed, onBallBounce, onCollectableHit
             )
             steps++
         }
 
-        // Drop excess time to prevent a spiral of death after a long stall.
-        if (accumulator > FIXED_DT * MAX_SUBSTEPS) accumulator = 0f
+        if (accumulator > FIXED_DT * maxSteps) accumulator = 0f
 
-        // Report activity from the actual ball state (not whether a step ran),
-        // so the round does not end during a sub-FIXED_DT gap frame.
-        var anyBallActive = false
+        return hasAnyActiveBall(balls)
+    }
+
+    private fun hasAnyActiveBall(balls: MutableList<Ball>): Boolean {
         for (i in balls.indices) {
             val b = balls[i]
-            if (b.active && b.launched) {
-                anyBallActive = true
-                break
-            }
+            if (b.active && b.launched) return true
         }
-        return anyBallActive
+        return false
     }
 
     private fun step(
         balls: MutableList<Ball>,
-        bricks: MutableList<Brick>,
         collectables: MutableList<Collectable>,
         bounds: GameBounds,
+        activeBallCount: Int,
         onBrickHit: (Brick, Ball) -> Unit,
         onBrickDestroyed: (Brick) -> Unit,
         onBallBounce: (Ball) -> Unit,
         onCollectableHit: (Collectable, Ball) -> Unit
-    ): Boolean {
-        var anyActive = false
+    ) {
+        val maxMicroSteps = when {
+            activeBallCount > 80 -> 1
+            activeBallCount > 40 -> 2
+            else -> 3
+        }
 
         for (i in balls.indices) {
             val ball = balls[i]
             if (!ball.active || !ball.launched) continue
 
             moveBallSwept(
-                ball, bounds,
+                ball, bounds, maxMicroSteps,
                 onBrickHit, onBrickDestroyed, onBallBounce
             )
 
             if (ball.active) {
-                anyActive = true
                 checkCollectables(ball, collectables, onCollectableHit)
             }
         }
-        return anyActive
     }
 
-    /**
-     * Moves the ball over one fixed step, but split into micro-steps no larger
-     * than half the ball radius. This prevents the ball from tunnelling through
-     * or between bricks at high speed (which previously made it slip through a
-     * gap and then get destroyed at the bottom).
-     */
     private fun moveBallSwept(
         ball: Ball,
         bounds: GameBounds,
+        maxMicroSteps: Int,
         onBrickHit: (Brick, Ball) -> Unit,
         onBrickDestroyed: (Brick) -> Unit,
         onBallBounce: (Ball) -> Unit
@@ -134,7 +130,7 @@ class PhysicsEngine(
         val dy = ball.vy * FIXED_DT
         val dist = sqrt(dx * dx + dy * dy)
         val maxStep = ball.radius
-        val subSteps = maxOf(1, kotlin.math.ceil(dist / maxStep).toInt().coerceAtMost(3))
+        val subSteps = maxOf(1, kotlin.math.ceil(dist / maxStep).toInt().coerceAtMost(maxMicroSteps))
         val subDt = FIXED_DT / subSteps
 
         for (s in 0 until subSteps) {
@@ -143,7 +139,6 @@ class PhysicsEngine(
             ball.x += ball.vx * subDt
             ball.y += ball.vy * subDt
 
-            // Bottom boundary - ball is done and returns to the launcher row.
             if (ball.y + ball.radius >= bounds.bottom) {
                 ball.y = bounds.bottom - ball.radius
                 ball.vx = 0f
@@ -226,21 +221,12 @@ class PhysicsEngine(
         ball.active = true
     }
 
-    /**
-     * Returns a launch angle (radians) that always points upward (negative Y in
-     * screen coords) toward the aim point. The angle is clamped so it stays at
-     * least MIN_ANGLE above horizontal, guaranteeing the ball travels up toward
-     * the bricks instead of skimming sideways.
-     */
     fun computeLaunchAngle(fromX: Float, fromY: Float, toX: Float, toY: Float): Float {
         val dx = toX - fromX
         var dy = toY - fromY
-        // Force the vertical component upward.
         if (dy > -1f) dy = -1f
-        var angle = kotlin.math.atan2(dy, dx) // in (-PI, 0)
+        var angle = kotlin.math.atan2(dy, dx)
         val pi = Math.PI.toFloat()
-        // Keep the shot within [-(PI - MIN_ANGLE), -MIN_ANGLE] so it always has a
-        // real upward component and never goes flat or downward.
         angle = angle.coerceIn(-pi + MIN_ANGLE, -MIN_ANGLE)
         return angle
     }
@@ -249,19 +235,17 @@ class PhysicsEngine(
         startX: Float, startY: Float,
         angle: Float,
         bounds: GameBounds,
-        bricks: List<Brick>,
-        steps: Int = 40
+        steps: Int = 28
     ): FloatArray {
         val points = trajectoryBuffer
         val maxPoints = points.size / 2
         val limit = minOf(steps, maxPoints)
-        points.fill(0f, 0, limit * 2)
         var x = startX
         var y = startY
         val speed = BALL_SPEED
         var vx = speed * kotlin.math.cos(angle)
         var vy = speed * kotlin.math.sin(angle)
-        val dt = 0.016f
+        val dt = 0.02f
 
         for (i in 0 until limit) {
             x += vx * dt
@@ -275,7 +259,6 @@ class PhysicsEngine(
             points[i * 2 + 1] = y
 
             if (y > bounds.bottom) {
-                // Zero remaining slots so callers can detect early termination.
                 for (j in (i + 1) until limit) {
                     points[j * 2] = 0f
                     points[j * 2 + 1] = 0f

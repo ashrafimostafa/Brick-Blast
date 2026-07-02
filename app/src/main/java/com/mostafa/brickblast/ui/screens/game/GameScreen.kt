@@ -1,7 +1,5 @@
 package com.mostafa.brickblast.ui.screens.game
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,27 +12,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GamePhase
-import com.mostafa.brickblast.game.renderer.GameRenderer
 import com.mostafa.brickblast.ui.accessibility.GameAccessibility
 import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
 import com.mostafa.brickblast.ui.components.AchievementPopup
@@ -54,10 +50,11 @@ fun GameScreen(
     val uiState by viewModel.uiState.collectAsState()
     val engine = viewModel.gameEngine
     val activity = LocalContext.current as? android.app.Activity
+    val context = LocalContext.current
+    val persianUi = LocalConfiguration.current.locales[0].language == "fa"
+    val pauseLabel = stringResource(R.string.pause_game)
     val isDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    val textMeasurer = rememberTextMeasurer(cacheSize = 128)
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-    var frameTick by remember { mutableIntStateOf(0) }
     var lastReportedPhase by remember(mode, challengeLevel, continueGame) {
         mutableStateOf<GamePhase?>(null)
     }
@@ -80,20 +77,6 @@ fun GameScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        var lastFrame = 0L
-        while (true) {
-            withFrameNanos { now ->
-                if (lastFrame != 0L) {
-                    val dt = ((now - lastFrame) / 1_000_000_000f).coerceAtMost(0.05f)
-                    viewModel.tick(dt)
-                }
-                lastFrame = now
-                frameTick++
-            }
-        }
-    }
-
     LaunchedEffect(uiState.phase, uiState.showContinueOffer) {
         if (uiState.showContinueOffer) return@LaunchedEffect
         val previous = lastReportedPhase
@@ -108,51 +91,41 @@ fun GameScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LiveRegionAnnouncement(
-            text = GameAccessibility.statusDescription(
+        val a11yText = remember(
+            uiState.score,
+            uiState.round,
+            uiState.phase,
+            uiState.totalBalls,
+            uiState.coins,
+            uiState.isAiming,
+            uiState.timeRemaining
+        ) {
+            GameAccessibility.statusDescription(
+                context = context,
                 score = uiState.score,
                 bestScore = engine.bestScore,
                 round = uiState.round,
                 totalBalls = uiState.totalBalls,
                 coins = uiState.coins,
                 phase = uiState.phase,
-                isAiming = engine.isAiming,
+                isAiming = uiState.isAiming,
                 timeRemaining = uiState.timeRemaining
-            ),
+            )
+        }
+        LiveRegionAnnouncement(
+            text = a11yText,
             modifier = Modifier.align(Alignment.TopStart)
         )
 
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .semantics { contentDescription = GameAccessibility.GAME_BOARD_DESCRIPTION }
-                .onSizeChanged { size -> canvasSize = size }
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragStart = { offset ->
-                            viewModel.onDragStart(offset.x, offset.y)
-                        },
-                        onDrag = { change, _ ->
-                            change.consume()
-                            viewModel.onDrag(change.position.x, change.position.y)
-                        },
-                        onDragEnd = { viewModel.onDragEnd() },
-                        onDragCancel = { }
-                    )
-                }
-        ) {
-            @Suppress("UNUSED_EXPRESSION")
-            frameTick
-            with(GameRenderer) {
-                renderGame(
-                    engine = engine,
-                    trajectoryPoints = engine.getTrajectoryPoints(),
-                    showTrajectory = uiState.showTrajectory,
-                    isDark = isDarkTheme,
-                    textMeasurer = textMeasurer
-                )
-            }
-        }
+        // Isolated layer: only this subtree recomposes every frame, not the HUD/overlays.
+        GameWorldCanvas(
+            viewModel = viewModel,
+            showTrajectory = uiState.showTrajectory,
+            isDarkTheme = isDarkTheme,
+            persianUi = persianUi,
+            onCanvasSizeChanged = { canvasSize = it },
+            modifier = Modifier.fillMaxSize()
+        )
 
         GameHud(
             score = uiState.score,
@@ -174,7 +147,7 @@ fun GameScreen(
                 .statusBarsPadding()
                 .padding(16.dp)
                 .size(56.dp)
-                .semantics { contentDescription = "Pause game" }
+                .semantics { contentDescription = pauseLabel }
         ) {
             Icon(Icons.Default.Pause, contentDescription = null)
         }
@@ -200,4 +173,31 @@ fun GameScreen(
             )
         }
     }
+}
+
+/** Draws and simulates the game world on a Choreographer-driven surface (no per-frame Compose). */
+@Composable
+private fun GameWorldCanvas(
+    viewModel: GameViewModel,
+    showTrajectory: Boolean,
+    isDarkTheme: Boolean,
+    persianUi: Boolean,
+    onCanvasSizeChanged: (IntSize) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val boardDescription = GameAccessibility.gameBoardDescription(context)
+
+    AndroidView(
+        factory = { ctx -> GameCanvasView(ctx) },
+        update = { view ->
+            view.viewModel = viewModel
+            view.showTrajectory = showTrajectory
+            view.isDarkTheme = isDarkTheme
+            view.persianUi = persianUi
+            view.onCanvasSizeChanged = { w, h -> onCanvasSizeChanged(IntSize(w, h)) }
+            view.contentDescription = boardDescription
+        },
+        modifier = modifier.semantics { contentDescription = boardDescription }
+    )
 }
