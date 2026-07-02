@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">بریک بلاست</string>
+
+    <!-- Branding -->
+    <string name="title_brick_blast">بریک بلاست</string>
+    <string name="tagline_break_bounce_blast">بزن. پرت کن. منفجرش کن.</string>
+
+    <!-- Main menu -->
+    <string name="menu_continue">ادامه</string>
+    <string name="menu_play">بازی</string>
+    <string name="menu_challenge">چالش</string>
+    <string name="menu_time_attack">حمله زمانی</string>
+    <string name="menu_hardcore">سخت‌گیرانه</string>
+    <string name="menu_statistics">آمار</string>
+    <string name="menu_settings">تنظیمات</string>
+
+    <!-- Game modes -->
+    <string name="mode_classic">کلاسیک</string>
+    <string name="mode_challenge">چالش</string>
+    <string name="mode_time_attack">حمله زمانی</string>
+    <string name="mode_hardcore">سخت‌گیرانه</string>
+
+    <!-- Common -->
+    <string name="back">بازگشت</string>
+    <string name="navigate_back">بازگشت</string>
+    <string name="on">روشن</string>
+    <string name="off">خاموش</string>
+    <string name="level">مرحله %1$d</string>
+    <string name="level_short">سطح %1$d</string>
+    <string name="round_label">دور %1$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_language">زبان</string>
+    <string name="language_system">پیش‌فرض سیستم</string>
+    <string name="language_english">انگلیسی</string>
+    <string name="language_persian">فارسی</string>
+    <string name="settings_dark_theme">تم تیره</string>
+    <string name="settings_sound_effects">جلوه‌های صوتی</string>
+    <string name="settings_music">موسیقی</string>
+    <string name="settings_vibration">لرزش</string>
+    <string name="settings_trajectory_preview">پیش‌نمایش مسیر</string>
+    <string name="settings_particle_effects">جلوه‌های ذره‌ای</string>
+
+    <!-- Game HUD -->
+    <string name="hud_best">بهترین  %1$d</string>
+    <string name="hud_new_best">رکورد جدید!</string>
+    <string name="hud_round">دور  %1$d</string>
+    <string name="hud_balls">توپ  %1$d</string>
+    <string name="hud_coins">سکه  %1$d</string>
+    <string name="hud_time">زمان  %1$dث</string>
+    <string name="pause_game">توقف بازی</string>
+
+    <!-- Pause -->
+    <string name="paused_title">متوقف شد</string>
+    <string name="paused_subtitle">کمی استراحت کنید</string>
+    <string name="resume">ادامه</string>
+    <string name="save_and_quit">ذخیره و خروج</string>
+
+    <!-- End screens -->
+    <string name="game_over">بازی تمام شد</string>
+    <string name="game_over_subtitle">به دور %1$d رسیدید</string>
+    <string name="victory">پیروزی!</string>
+    <string name="victory_challenge_subtitle">مرحله %1$d تکمیل شد</string>
+    <string name="victory_round_subtitle">دور %1$d تکمیل شد</string>
+    <string name="score_label">امتیاز</string>
+    <string name="score_points">امتیاز %1$d</string>
+    <string name="mode_label">حالت: %1$s</string>
+    <string name="next_level">مرحله بعد</string>
+    <string name="play_again">بازی دوباره</string>
+    <string name="share_score">اشتراک امتیاز</string>
+    <string name="end_screen_announcement">%1$s. امتیاز نهایی %2$d. %3$s. حالت %4$s.</string>
+
+    <!-- Continue offer (store) -->
+    <string name="continue_so_close">خیلی نزدیک بود!</string>
+    <string name="continue_ad_message">یک تبلیغ کوتاه ببینید تا ۵ ردیف آجر حذف شود و بازی را ادامه دهید.</string>
+    <string name="continue_loading_ad">در حال بارگذاری تبلیغ…</string>
+    <string name="continue_watch_ad">تماشای تبلیغ و ادامه</string>
+    <string name="continue_end_game">پایان بازی</string>
+
+    <!-- Challenge -->
+    <string name="challenge_mode">حالت چالش</string>
+    <string name="challenge_description">همه آجرها را بشکنید تا برنده شوید • %1$d مرحله</string>
+    <string name="challenge_unlocked">باز شده: %1$d / %2$d</string>
+    <string name="challenge_page">صفحه %1$d / %2$d</string>
+    <string name="challenge_previous_page">صفحه قبل</string>
+    <string name="challenge_next_page">صفحه بعد</string>
+    <string name="challenge_level_locked">مرحله %1$d، قفل</string>
+    <string name="challenge_level_completed">مرحله %1$d، تکمیل شده</string>
+    <string name="challenge_level">مرحله %1$d</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">آمار</string>
+    <string name="player_stats">آمار بازیکن</string>
+    <string name="stat_highest_round">بالاترین دور</string>
+    <string name="stat_bricks_destroyed">آجرهای شکسته</string>
+    <string name="stat_balls_launched">توپ‌های پرتاب‌شده</string>
+    <string name="stat_play_time">زمان بازی</string>
+    <string name="stat_coins_earned">سکه‌های کسب‌شده</string>
+    <string name="stat_games_played">بازی‌های انجام‌شده</string>
+    <string name="high_scores">بالاترین امتیازها</string>
+    <string name="high_score_entry">#%1$d %2$s</string>
+    <string name="high_score_value">%1$d (د%2$d)</string>
+    <string name="achievements">دستاوردها</string>
+    <string name="achievement_progress">%1$d/%2$d</string>
+    <string name="stat_line">%1$s: %2$s</string>
+    <string name="stat_line_a11y">%1$s، %2$s</string>
+    <string name="play_time_hours_minutes">%1$dس %2$dد</string>
+    <string name="play_time_minutes">%1$dد</string>
+
+    <!-- Shop -->
+    <string name="shop_title">فروشگاه</string>
+    <string name="shop_your_coins">سکه‌های شما: %1$d</string>
+    <string name="shop_subtitle">سکه‌ها را برای ارتقای دائمی خرج کنید</string>
+    <string name="upgrade_ball_damage_plus">آسیب توپ +۱</string>
+    <string name="upgrade_starting_balls_plus">توپ شروع +۱</string>
+    <string name="upgrade_coin_multiplier">ضریب سکه</string>
+    <string name="upgrade_critical_hit_chance">شانس ضربه بحرانی</string>
+    <string name="upgrade_level">سطح %1$d</string>
+
+    <!-- Upgrades -->
+    <string name="upgrades_title">ارتقاها</string>
+    <string name="coins_label">سکه: %1$d</string>
+    <string name="upgrade_ball_damage">آسیب توپ</string>
+    <string name="upgrade_starting_balls">توپ‌های شروع</string>
+    <string name="upgrade_critical_hit">ضربه بحرانی</string>
+    <string name="upgrade_cost_coins">%1$d سکه</string>
+
+    <!-- Achievements -->
+    <string name="achievement_unlocked">دستاورد باز شد!</string>
+    <string name="achievement_unlocked_announcement">دستاورد باز شد: %1$s. %2$s</string>
+    <string name="achievement_brick_breaker_title">شکننده آجر</string>
+    <string name="achievement_brick_breaker_desc">۱۰۰ آجر را بشکنید</string>
+    <string name="achievement_half_century_title">نیم قرن</string>
+    <string name="achievement_half_century_desc">به دور ۵۰ برسید</string>
+    <string name="achievement_coin_collector_title">جمع‌آور سکه</string>
+    <string name="achievement_coin_collector_desc">۵۰۰ سکه جمع کنید</string>
+    <string name="achievement_ball_hoarder_title">انباردار توپ</string>
+    <string name="achievement_ball_hoarder_desc">۵۰ توپ داشته باشید</string>
+
+    <!-- Share -->
+    <string name="share_score_text">من در بریک بلاست (%3$s) در دور %2$d امتیاز %1$d گرفتم! می‌توانی شکستم بدهی؟</string>
+    <string name="share_chooser_title">اشتراک امتیاز</string>
+    <string name="share_card_game_over">بازی تمام شد</string>
+    <string name="share_card_points">امتیاز</string>
+    <string name="share_card_round">دور %1$d</string>
+    <string name="share_card_challenge">می‌توانی امتیازم را بشکنی؟</string>
+
+    <!-- In-game floating text -->
+    <string name="floating_crit">بحرانی!</string>
+    <string name="floating_plus_balls">+۳ توپ!</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_game_board">صفحه بازی. از پرتاب‌کننده به بالا بکشید تا هدف بگیرید، سپس رها کنید تا به آجرها شلیک کنید.</string>
+    <string name="a11y_status_score">امتیاز %1$d.</string>
+    <string name="a11y_status_new_best"> رکورد جدید.</string>
+    <string name="a11y_status_best"> بهترین امتیاز %1$d.</string>
+    <string name="a11y_status_round"> دور %1$d.</string>
+    <string name="a11y_status_balls"> توپ %1$d.</string>
+    <string name="a11y_status_coins"> سکه %1$d.</string>
+    <string name="a11y_status_time"> زمان باقی‌مانده %1$d ثانیه.</string>
+    <string name="a11y_phase_aiming_drag">در حال هدف‌گیری. به بالا بکشید تا جهت را تنظیم کنید، سپس رها کنید.</string>
+    <string name="a11y_phase_aiming_ready">آماده هدف‌گیری. روی صفحه بازی به بالا بکشید.</string>
+    <string name="a11y_phase_launching">در حال پرتاب توپ‌ها.</string>
+    <string name="a11y_phase_simulating">توپ‌ها در حال بازی.</string>
+    <string name="a11y_phase_round_end">پایان دور.</string>
+    <string name="a11y_phase_paused">بازی متوقف شد.</string>
+    <string name="a11y_phase_game_over">بازی تمام شد.</string>
+    <string name="a11y_phase_victory">مرحله تکمیل شد. پیروزی.</string>
+</resources>

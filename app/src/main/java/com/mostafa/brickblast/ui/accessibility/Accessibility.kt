@@ -16,7 +16,9 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mostafa.brickblast.R
 
 /** Marks text as a screen/section heading for TalkBack navigation. */
 fun Modifier.screenHeading(): Modifier = semantics { heading() }
@@ -42,10 +44,12 @@ fun Modifier.toggleRowSemantics(
     label: String,
     checked: Boolean
 ): Modifier = composed {
+    val onLabel = stringResource(R.string.on)
+    val offLabel = stringResource(R.string.off)
     semantics(mergeDescendants = true) {
         role = Role.Switch
         contentDescription = label
-        stateDescription = if (checked) "On" else "Off"
+        stateDescription = if (checked) onLabel else offLabel
     }
 }
 

@@ -16,9 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.ui.accessibility.rememberReducedMotion
 import com.mostafa.brickblast.ui.accessibility.screenHeading
 import kotlinx.coroutines.delay
@@ -55,14 +57,14 @@ fun SplashScreen(onFinished: () -> Unit) {
             modifier = Modifier.alpha(alpha.value)
         ) {
             Text(
-                text = "BRICK BLAST",
+                text = stringResource(R.string.title_brick_blast),
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
                 color = accent,
                 modifier = Modifier.screenHeading()
             )
             Text(
-                text = "Break. Bounce. Blast.",
+                text = stringResource(R.string.tagline_break_bounce_blast),
                 fontSize = 16.sp,
                 color = ink.copy(alpha = 0.7f)
             )

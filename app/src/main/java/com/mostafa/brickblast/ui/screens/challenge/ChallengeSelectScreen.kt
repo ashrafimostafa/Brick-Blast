@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.domain.model.ChallengeConfig
 import com.mostafa.brickblast.domain.model.ChallengeProgress
 import com.mostafa.brickblast.ui.accessibility.screenHeading
@@ -59,16 +61,25 @@ fun ChallengeSelectScreen(
 ) {
     var currentPage by remember { mutableIntStateOf(0) }
     val levels = ChallengeConfig.levelsOnPage(currentPage).toList()
-    val pageLabel = "Page ${currentPage + 1} / ${ChallengeConfig.totalPages}"
+    val navigateBackLabel = stringResource(R.string.navigate_back)
+    val previousPageLabel = stringResource(R.string.challenge_previous_page)
+    val nextPageLabel = stringResource(R.string.challenge_next_page)
+    val pageLabel = stringResource(
+        R.string.challenge_page,
+        currentPage + 1,
+        ChallengeConfig.totalPages
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Challenge Mode", modifier = Modifier.screenHeading()) },
+                title = { Text(stringResource(R.string.challenge_mode), modifier = Modifier.screenHeading()) },
                 navigationIcon = {
                     IconButton(
                         onClick = onBack,
-                        modifier = Modifier.semantics { contentDescription = "Navigate back" }
+                        modifier = Modifier.semantics {
+                            contentDescription = navigateBackLabel
+                        }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
@@ -84,20 +95,23 @@ fun ChallengeSelectScreen(
                 .padding(16.dp)
         ) {
             Text(
-                "Clear all bricks to win • ${ChallengeConfig.TOTAL_LEVELS} levels",
+                stringResource(R.string.challenge_description, ChallengeConfig.TOTAL_LEVELS),
                 color = MaterialTheme.colorScheme.onBackground.copy(0.65f),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             Text(
-                "Unlocked: ${progress.highestUnlocked} / ${ChallengeConfig.TOTAL_LEVELS}",
+                stringResource(
+                    R.string.challenge_unlocked,
+                    progress.highestUnlocked,
+                    ChallengeConfig.TOTAL_LEVELS
+                ),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // Page navigation
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,7 +123,10 @@ fun ChallengeSelectScreen(
                     onClick = { if (currentPage > 0) currentPage-- },
                     enabled = currentPage > 0
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous page")
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = previousPageLabel
+                    )
                 }
                 Text(
                     pageLabel,
@@ -127,7 +144,10 @@ fun ChallengeSelectScreen(
                     },
                     enabled = currentPage < ChallengeConfig.totalPages - 1
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next page")
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = nextPageLabel
+                    )
                 }
             }
 
@@ -169,9 +189,9 @@ private fun ChallengeLevelCard(
     }
 
     val a11yLabel = when {
-        !unlocked -> "Level $level, locked"
-        completed -> "Level $level, completed"
-        else -> "Level $level"
+        !unlocked -> stringResource(R.string.challenge_level_locked, level)
+        completed -> stringResource(R.string.challenge_level_completed, level)
+        else -> stringResource(R.string.challenge_level, level)
     }
 
     Card(

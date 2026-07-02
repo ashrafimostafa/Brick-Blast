@@ -19,14 +19,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.ui.accessibility.screenHeading
+import com.mostafa.brickblast.ui.util.gameModeLabel
+import com.mostafa.brickblast.ui.util.localizedTitle
 import com.mostafa.brickblast.ui.viewmodel.StatisticsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,15 +42,18 @@ fun StatisticsScreen(
     val stats by viewModel.statistics.collectAsState()
     val achievements by viewModel.achievements.collectAsState()
     val topScores by viewModel.topScores.collectAsState()
+    val navigateBackLabel = stringResource(R.string.navigate_back)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Statistics", modifier = Modifier.screenHeading()) },
+                title = { Text(stringResource(R.string.statistics_title), modifier = Modifier.screenHeading()) },
                 navigationIcon = {
                     IconButton(
                         onClick = onBack,
-                        modifier = Modifier.semantics { contentDescription = "Navigate back" }
+                        modifier = Modifier.semantics {
+                            contentDescription = navigateBackLabel
+                        }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
@@ -64,21 +71,21 @@ fun StatisticsScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                "Player Stats",
+                stringResource(R.string.player_stats),
                 color = Color(0xFF448AFF),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.screenHeading()
             )
-            StatLine("Highest Round", stats.highestRound.toString())
-            StatLine("Bricks Destroyed", stats.totalBricksDestroyed.toString())
-            StatLine("Balls Launched", stats.totalBallsLaunched.toString())
-            StatLine("Play Time", formatPlayTime(stats.totalPlayTimeMs))
-            StatLine("Coins Earned", stats.totalCoinsEarned.toString())
-            StatLine("Games Played", stats.totalGamesPlayed.toString())
+            StatLine(stringResource(R.string.stat_highest_round), stats.highestRound.toString())
+            StatLine(stringResource(R.string.stat_bricks_destroyed), stats.totalBricksDestroyed.toString())
+            StatLine(stringResource(R.string.stat_balls_launched), stats.totalBallsLaunched.toString())
+            StatLine(stringResource(R.string.stat_play_time), formatPlayTime(stats.totalPlayTimeMs))
+            StatLine(stringResource(R.string.stat_coins_earned), stats.totalCoinsEarned.toString())
+            StatLine(stringResource(R.string.stat_games_played), stats.totalGamesPlayed.toString())
 
             Text(
-                "High Scores",
+                stringResource(R.string.high_scores),
                 color = Color(0xFF448AFF),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -87,11 +94,14 @@ fun StatisticsScreen(
                     .screenHeading()
             )
             topScores.forEachIndexed { i, (score, round, mode) ->
-                StatLine("#${i + 1} $mode", "$score (R$round)")
+                StatLine(
+                    stringResource(R.string.high_score_entry, i + 1, gameModeLabel(mode)),
+                    stringResource(R.string.high_score_value, score, round)
+                )
             }
 
             Text(
-                "Achievements",
+                stringResource(R.string.achievements),
                 color = Color(0xFF448AFF),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -100,8 +110,12 @@ fun StatisticsScreen(
                     .screenHeading()
             )
             achievements.forEach { a ->
-                val status = if (a.unlocked) "✓" else "${a.progress}/${a.target}"
-                StatLine(a.title, status)
+                val status = if (a.unlocked) {
+                    "✓"
+                } else {
+                    stringResource(R.string.achievement_progress, a.progress, a.target)
+                }
+                StatLine(a.localizedTitle(), status)
             }
         }
     }
@@ -109,16 +123,23 @@ fun StatisticsScreen(
 
 @Composable
 private fun StatLine(label: String, value: String) {
+    val line = stringResource(R.string.stat_line, label, value)
+    val a11y = stringResource(R.string.stat_line_a11y, label, value)
     Text(
-        "$label: $value",
+        line,
         color = Color.White,
         fontSize = 15.sp,
-        modifier = Modifier.semantics { contentDescription = "$label, $value" }
+        modifier = Modifier.semantics { contentDescription = a11y }
     )
 }
 
+@Composable
 private fun formatPlayTime(ms: Long): String {
     val minutes = ms / 60000
     val hours = minutes / 60
-    return if (hours > 0) "${hours}h ${minutes % 60}m" else "${minutes}m"
+    return if (hours > 0) {
+        stringResource(R.string.play_time_hours_minutes, hours, minutes % 60)
+    } else {
+        stringResource(R.string.play_time_minutes, minutes)
+    }
 }

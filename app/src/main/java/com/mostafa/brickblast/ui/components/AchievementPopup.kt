@@ -10,21 +10,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.domain.model.Achievement
 import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
 import com.mostafa.brickblast.ui.accessibility.rememberReducedMotion
+import com.mostafa.brickblast.ui.util.localizedDescription
+import com.mostafa.brickblast.ui.util.localizedTitle
 import kotlinx.coroutines.delay
 
 @Composable
@@ -35,7 +38,13 @@ fun AchievementPopup(
 ) {
     val achievement = achievements.firstOrNull() ?: return
     val reducedMotion = rememberReducedMotion()
-    val announcement = "Achievement unlocked: ${achievement.title}. ${achievement.description}"
+    val title = achievement.localizedTitle()
+    val description = achievement.localizedDescription()
+    val announcement = stringResource(
+        R.string.achievement_unlocked_announcement,
+        title,
+        description
+    )
 
     LaunchedEffect(achievement.id) {
         delay(3000)
@@ -60,9 +69,13 @@ fun AchievementPopup(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text("Achievement Unlocked!", color = Color(0xFFFFD600), fontSize = 14.sp)
-            Text(achievement.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text(achievement.description, color = Color.White.copy(0.8f), fontSize = 13.sp)
+            Text(
+                stringResource(R.string.achievement_unlocked),
+                color = Color(0xFFFFD600),
+                fontSize = 14.sp
+            )
+            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(description, color = Color.White.copy(0.8f), fontSize = 13.sp)
         }
     }
 }

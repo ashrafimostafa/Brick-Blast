@@ -1,4 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Brick Blast</string>
+
+    <!-- Branding -->
+    <string name="title_brick_blast">BRICK BLAST</string>
+    <string name="tagline_break_bounce_blast">Break. Bounce. Blast.</string>
+
+    <!-- Main menu -->
+    <string name="menu_continue">Continue</string>
+    <string name="menu_play">Play</string>
+    <string name="menu_challenge">Challenge</string>
+    <string name="menu_time_attack">Time Attack</string>
+    <string name="menu_hardcore">Hardcore</string>
+    <string name="menu_statistics">Statistics</string>
+    <string name="menu_settings">Settings</string>
+
+    <!-- Game modes -->
+    <string name="mode_classic">Classic</string>
+    <string name="mode_challenge">Challenge</string>
+    <string name="mode_time_attack">Time Attack</string>
+    <string name="mode_hardcore">Hardcore</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="navigate_back">Navigate back</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="level">Level %1$d</string>
+    <string name="level_short">Lv %1$d</string>
+    <string name="round_label">Round %1$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_english">English</string>
+    <string name="language_persian">Persian</string>
+    <string name="settings_dark_theme">Dark Theme</string>
+    <string name="settings_sound_effects">Sound Effects</string>
+    <string name="settings_music">Music</string>
+    <string name="settings_vibration">Vibration</string>
+    <string name="settings_trajectory_preview">Trajectory Preview</string>
+    <string name="settings_particle_effects">Particle Effects</string>
+
+    <!-- Game HUD -->
+    <string name="hud_best">BEST  %1$d</string>
+    <string name="hud_new_best">NEW BEST!</string>
+    <string name="hud_round">Round  %1$d</string>
+    <string name="hud_balls">Balls  %1$d</string>
+    <string name="hud_coins">Coins  %1$d</string>
+    <string name="hud_time">Time  %1$ds</string>
+    <string name="pause_game">Pause game</string>
+
+    <!-- Pause -->
+    <string name="paused_title">Paused</string>
+    <string name="paused_subtitle">Take a break</string>
+    <string name="resume">Resume</string>
+    <string name="save_and_quit">Save &amp; Quit</string>
+
+    <!-- End screens -->
+    <string name="game_over">Game Over</string>
+    <string name="game_over_subtitle">You reached round %1$d</string>
+    <string name="victory">Victory!</string>
+    <string name="victory_challenge_subtitle">Level %1$d complete</string>
+    <string name="victory_round_subtitle">Completed round %1$d</string>
+    <string name="score_label">SCORE</string>
+    <string name="score_points">Score %1$d points</string>
+    <string name="mode_label">Mode: %1$s</string>
+    <string name="next_level">Next Level</string>
+    <string name="play_again">Play Again</string>
+    <string name="share_score">Share Score</string>
+    <string name="end_screen_announcement">%1$s. Final score %2$d points. %3$s. Mode %4$s.</string>
+
+    <!-- Continue offer (store) -->
+    <string name="continue_so_close">So Close!</string>
+    <string name="continue_ad_message">Watch a short ad to remove 5 rows of bricks and keep playing.</string>
+    <string name="continue_loading_ad">Loading ad…</string>
+    <string name="continue_watch_ad">Watch Ad &amp; Continue</string>
+    <string name="continue_end_game">End Game</string>
+
+    <!-- Challenge -->
+    <string name="challenge_mode">Challenge Mode</string>
+    <string name="challenge_description">Clear all bricks to win • %1$d levels</string>
+    <string name="challenge_unlocked">Unlocked: %1$d / %2$d</string>
+    <string name="challenge_page">Page %1$d / %2$d</string>
+    <string name="challenge_previous_page">Previous page</string>
+    <string name="challenge_next_page">Next page</string>
+    <string name="challenge_level_locked">Level %1$d, locked</string>
+    <string name="challenge_level_completed">Level %1$d, completed</string>
+    <string name="challenge_level">Level %1$d</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">Statistics</string>
+    <string name="player_stats">Player Stats</string>
+    <string name="stat_highest_round">Highest Round</string>
+    <string name="stat_bricks_destroyed">Bricks Destroyed</string>
+    <string name="stat_balls_launched">Balls Launched</string>
+    <string name="stat_play_time">Play Time</string>
+    <string name="stat_coins_earned">Coins Earned</string>
+    <string name="stat_games_played">Games Played</string>
+    <string name="high_scores">High Scores</string>
+    <string name="high_score_entry">#%1$d %2$s</string>
+    <string name="high_score_value">%1$d (R%2$d)</string>
+    <string name="achievements">Achievements</string>
+    <string name="achievement_progress">%1$d/%2$d</string>
+    <string name="stat_line">%1$s: %2$s</string>
+    <string name="stat_line_a11y">%1$s, %2$s</string>
+    <string name="play_time_hours_minutes">%1$dh %2$dm</string>
+    <string name="play_time_minutes">%1$dm</string>
+
+    <!-- Shop -->
+    <string name="shop_title">Shop</string>
+    <string name="shop_your_coins">Your Coins: %1$d</string>
+    <string name="shop_subtitle">Spend coins on permanent upgrades</string>
+    <string name="upgrade_ball_damage_plus">Ball Damage +1</string>
+    <string name="upgrade_starting_balls_plus">Starting Balls +1</string>
+    <string name="upgrade_coin_multiplier">Coin Multiplier</string>
+    <string name="upgrade_critical_hit_chance">Critical Hit Chance</string>
+    <string name="upgrade_level">Level %1$d</string>
+
+    <!-- Upgrades -->
+    <string name="upgrades_title">Upgrades</string>
+    <string name="coins_label">Coins: %1$d</string>
+    <string name="upgrade_ball_damage">Ball Damage</string>
+    <string name="upgrade_starting_balls">Starting Balls</string>
+    <string name="upgrade_critical_hit">Critical Hit</string>
+    <string name="upgrade_cost_coins">%1$d coins</string>
+
+    <!-- Achievements -->
+    <string name="achievement_unlocked">Achievement Unlocked!</string>
+    <string name="achievement_unlocked_announcement">Achievement unlocked: %1$s. %2$s</string>
+    <string name="achievement_brick_breaker_title">Brick Breaker</string>
+    <string name="achievement_brick_breaker_desc">Destroy 100 bricks</string>
+    <string name="achievement_half_century_title">Half Century</string>
+    <string name="achievement_half_century_desc">Reach Round 50</string>
+    <string name="achievement_coin_collector_title">Coin Collector</string>
+    <string name="achievement_coin_collector_desc">Collect 500 coins</string>
+    <string name="achievement_ball_hoarder_title">Ball Hoarder</string>
+    <string name="achievement_ball_hoarder_desc">Own 50 balls</string>
+
+    <!-- Share -->
+    <string name="share_score_text">I scored %1$d points on round %2$d in Brick Blast (%3$s)! Can you beat me?</string>
+    <string name="share_chooser_title">Share your score</string>
+    <string name="share_card_game_over">GAME OVER</string>
+    <string name="share_card_points">POINTS</string>
+    <string name="share_card_round">Round %1$d</string>
+    <string name="share_card_challenge">Can you beat my score?</string>
+
+    <!-- In-game floating text -->
+    <string name="floating_crit">CRIT!</string>
+    <string name="floating_plus_balls">+3 Balls!</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_game_board">Game board. Drag upward from the launcher to aim, then release to shoot balls at the bricks.</string>
+    <string name="a11y_status_score">Score %1$d.</string>
+    <string name="a11y_status_new_best"> New best score.</string>
+    <string name="a11y_status_best"> Best score %1$d.</string>
+    <string name="a11y_status_round"> Round %1$d.</string>
+    <string name="a11y_status_balls"> Balls %1$d.</string>
+    <string name="a11y_status_coins"> Coins %1$d.</string>
+    <string name="a11y_status_time"> Time remaining %1$d seconds.</string>
+    <string name="a11y_phase_aiming_drag">Aiming. Drag upward to adjust shot direction, then release to fire.</string>
+    <string name="a11y_phase_aiming_ready">Ready to aim. Drag upward on the game board to shoot.</string>
+    <string name="a11y_phase_launching">Launching balls.</string>
+    <string name="a11y_phase_simulating">Balls in play.</string>
+    <string name="a11y_phase_round_end">Round ending.</string>
+    <string name="a11y_phase_paused">Game paused.</string>
+    <string name="a11y_phase_game_over">Game over.</string>
+    <string name="a11y_phase_victory">Level complete. Victory.</string>
 </resources>

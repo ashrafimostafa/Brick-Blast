@@ -5,6 +5,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.mostafa.brickblast.ui.theme.DefaultTypography
+import com.mostafa.brickblast.ui.theme.PersianTypography
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF448AFF),
@@ -37,10 +39,12 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun BrickBlastTheme(
     darkTheme: Boolean = true,
+    persianUi: Boolean = false,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+        typography = if (persianUi) PersianTypography else DefaultTypography,
         content = content
     )
 }

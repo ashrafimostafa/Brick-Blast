@@ -21,10 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.domain.model.UpgradeType
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.viewmodel.UpgradeViewModel
@@ -41,10 +43,10 @@ fun UpgradeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Upgrades") },
+                title = { Text(stringResource(R.string.upgrades_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -58,17 +60,38 @@ fun UpgradeScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Coins: $coins", color = Color(0xFFFFD600), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            UpgradeRow("Ball Damage", "Lv ${upgrades.ballDamageLevel}", upgrades.upgradeCost(UpgradeType.BALL_DAMAGE)) {
+            Text(
+                stringResource(R.string.coins_label, coins),
+                color = Color(0xFFFFD600),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            UpgradeRow(
+                stringResource(R.string.upgrade_ball_damage),
+                stringResource(R.string.level_short, upgrades.ballDamageLevel),
+                upgrades.upgradeCost(UpgradeType.BALL_DAMAGE)
+            ) {
                 viewModel.upgrade(UpgradeType.BALL_DAMAGE)
             }
-            UpgradeRow("Starting Balls", "Lv ${upgrades.startingBallsLevel}", upgrades.upgradeCost(UpgradeType.STARTING_BALLS)) {
+            UpgradeRow(
+                stringResource(R.string.upgrade_starting_balls),
+                stringResource(R.string.level_short, upgrades.startingBallsLevel),
+                upgrades.upgradeCost(UpgradeType.STARTING_BALLS)
+            ) {
                 viewModel.upgrade(UpgradeType.STARTING_BALLS)
             }
-            UpgradeRow("Coin Multiplier", "Lv ${upgrades.coinMultiplierLevel}", upgrades.upgradeCost(UpgradeType.COIN_MULTIPLIER)) {
+            UpgradeRow(
+                stringResource(R.string.upgrade_coin_multiplier),
+                stringResource(R.string.level_short, upgrades.coinMultiplierLevel),
+                upgrades.upgradeCost(UpgradeType.COIN_MULTIPLIER)
+            ) {
                 viewModel.upgrade(UpgradeType.COIN_MULTIPLIER)
             }
-            UpgradeRow("Critical Hit", "Lv ${upgrades.criticalHitLevel}", upgrades.upgradeCost(UpgradeType.CRITICAL_HIT)) {
+            UpgradeRow(
+                stringResource(R.string.upgrade_critical_hit),
+                stringResource(R.string.level_short, upgrades.criticalHitLevel),
+                upgrades.upgradeCost(UpgradeType.CRITICAL_HIT)
+            ) {
                 viewModel.upgrade(UpgradeType.CRITICAL_HIT)
             }
         }
@@ -87,7 +110,7 @@ private fun UpgradeRow(label: String, level: String, cost: Int, onUpgrade: () ->
             Text(level, color = Color.White.copy(0.6f), fontSize = 13.sp)
         }
         GameButton(
-            text = "$cost coins",
+            text = stringResource(R.string.upgrade_cost_coins, cost),
             onClick = onUpgrade,
             modifier = Modifier.fillMaxWidth(0.4f)
         )

@@ -7,12 +7,14 @@ import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
 import com.mostafa.brickblast.domain.model.ChallengeProgress
+import com.mostafa.brickblast.domain.model.GameSaveState
 import com.mostafa.brickblast.domain.repository.ChallengeRepository
 import com.mostafa.brickblast.domain.repository.GameSaveRepository
 import com.mostafa.brickblast.domain.repository.HighScoreRepository
 import com.mostafa.brickblast.domain.repository.PlayerRepository
 import com.mostafa.brickblast.domain.repository.SettingsRepository
 import com.mostafa.brickblast.game.audio.AudioManager
+import com.mostafa.brickblast.ui.util.LocaleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -21,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MenuViewModel @Inject constructor(
-    gameSaveRepository: GameSaveRepository,
+    private val gameSaveRepository: GameSaveRepository,
     playerRepository: PlayerRepository
 ) : ViewModel() {
     val hasActiveSave = gameSaveRepository.hasActiveSave()
@@ -29,6 +31,8 @@ class MenuViewModel @Inject constructor(
 
     val coins = playerRepository.coins
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
+    suspend fun getRecentSave(): GameSaveState? = gameSaveRepository.getMostRecentSave()
 }
 
 @HiltViewModel
@@ -83,6 +87,11 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.updateSettings { it.copy(darkTheme = enabled) }
         }
+    }
+
+    suspend fun applyLanguage(languageTag: String?) {
+        settingsRepository.updateSettings { it.copy(languageTag = languageTag) }
+        LocaleManager.apply(languageTag)
     }
 }
 

@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.components.SecondaryButton
@@ -35,26 +37,30 @@ fun ContinueOfferOverlay(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "So Close!",
+            text = stringResource(R.string.continue_so_close),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFFFF5252),
             modifier = Modifier.screenHeading()
         )
         Text(
-            text = "Watch a short ad to remove 5 rows of bricks and keep playing.",
+            text = stringResource(R.string.continue_ad_message),
             fontSize = 16.sp,
             color = Color.White.copy(alpha = 0.75f),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 16.dp)
         )
         GameButton(
-            text = if (loading) "Loading ad…" else "Watch Ad & Continue",
+            text = if (loading) {
+                stringResource(R.string.continue_loading_ad)
+            } else {
+                stringResource(R.string.continue_watch_ad)
+            },
             onClick = onWatchAd,
             enabled = !loading
         )
         SecondaryButton(
-            text = "End Game",
+            text = stringResource(R.string.continue_end_game),
             onClick = onGiveUp,
             modifier = Modifier.padding(top = 12.dp)
         )

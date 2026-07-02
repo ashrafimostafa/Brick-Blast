@@ -4,9 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -21,24 +19,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.domain.model.ChallengeConfig
+import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.ui.accessibility.LiveRegionAnnouncement
 import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.components.SecondaryButton
 import com.mostafa.brickblast.ui.util.ScoreShareCard
 import com.mostafa.brickblast.ui.util.ScoreShareHelper
+import com.mostafa.brickblast.ui.util.gameModeLabel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -55,20 +57,24 @@ fun PauseScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Paused",
+            stringResource(R.string.paused_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             modifier = Modifier.screenHeading()
         )
         Text(
-            "Take a break",
+            stringResource(R.string.paused_subtitle),
             fontSize = 16.sp,
             color = Color.White.copy(0.6f),
             modifier = Modifier.padding(top = 8.dp, bottom = 32.dp)
         )
-        GameButton(text = "Resume", onClick = onResume)
-        SecondaryButton(text = "Save & Quit", onClick = onQuit, modifier = Modifier.padding(top = 12.dp))
+        GameButton(text = stringResource(R.string.resume), onClick = onResume)
+        SecondaryButton(
+            text = stringResource(R.string.save_and_quit),
+            onClick = onQuit,
+            modifier = Modifier.padding(top = 12.dp)
+        )
     }
 }
 
@@ -81,8 +87,8 @@ fun GameOverScreen(
     onBack: () -> Unit
 ) {
     EndGameScreen(
-        title = "Game Over",
-        subtitle = "You reached round $round",
+        title = stringResource(R.string.game_over),
+        subtitle = stringResource(R.string.game_over_subtitle, round),
         score = score,
         roundReached = round,
         mode = mode,
@@ -103,12 +109,16 @@ fun VictoryScreen(
     onNextLevel: (() -> Unit)? = null,
     onBack: () -> Unit
 ) {
-    val isChallenge = mode == "CHALLENGE"
+    val isChallenge = mode == GameMode.CHALLENGE.name
     val hasNextLevel = isChallenge && challengeLevel < ChallengeConfig.TOTAL_LEVELS
 
     EndGameScreen(
-        title = "Victory!",
-        subtitle = if (isChallenge) "Level $challengeLevel complete" else "Completed round $round",
+        title = stringResource(R.string.victory),
+        subtitle = if (isChallenge) {
+            stringResource(R.string.victory_challenge_subtitle, challengeLevel)
+        } else {
+            stringResource(R.string.victory_round_subtitle, round)
+        },
         score = score,
         roundReached = round,
         mode = mode,
@@ -116,7 +126,7 @@ fun VictoryScreen(
         onBack = onBack,
         showShare = false,
         titleColor = Color(0xFF69F0AE),
-        nextButtonText = if (hasNextLevel) "Next Level" else null,
+        nextButtonText = if (hasNextLevel) stringResource(R.string.next_level) else null,
         onNextLevel = if (hasNextLevel) onNextLevel else null
     )
 }
@@ -136,6 +146,7 @@ private fun EndGameScreen(
     onNextLevel: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val localizedMode = gameModeLabel(mode)
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val ink = MaterialTheme.colorScheme.onBackground
     val muted = ink.copy(alpha = 0.65f)
@@ -144,7 +155,7 @@ private fun EndGameScreen(
 
     LaunchedEffect(sharing) {
         if (!sharing) return@LaunchedEffect
-        delay(50) // one frame so the share card is recorded into the graphics layer
+        delay(50)
         val bitmap = runCatching { graphicsLayer.toImageBitmap() }.getOrNull()
         sharing = false
         if (bitmap != null) {
@@ -158,7 +169,13 @@ private fun EndGameScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         LiveRegionAnnouncement(
-            text = "$title. Final score $score points. $subtitle. Mode ${mode.replace('_', ' ')}."
+            text = stringResource(
+                R.string.end_screen_announcement,
+                title,
+                score,
+                subtitle,
+                localizedMode
+            )
         )
 
         Column(
@@ -188,17 +205,17 @@ private fun EndGameScreen(
                 fontWeight = FontWeight.Bold,
                 color = ink,
                 modifier = Modifier.semantics {
-                    contentDescription = "Score $score points"
+                    contentDescription = context.getString(R.string.score_points, score)
                 }
             )
             Text(
-                text = "SCORE",
+                text = stringResource(R.string.score_label),
                 fontSize = 14.sp,
                 color = muted,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             Text(
-                text = "Mode: ${mode.replace('_', ' ')}",
+                text = stringResource(R.string.mode_label, localizedMode),
                 fontSize = 14.sp,
                 color = muted.copy(alpha = 0.8f),
                 modifier = Modifier.padding(bottom = 40.dp)
@@ -207,28 +224,27 @@ private fun EndGameScreen(
             if (nextButtonText != null && onNextLevel != null) {
                 GameButton(text = nextButtonText, onClick = onNextLevel)
                 SecondaryButton(
-                    text = "Play Again",
+                    text = stringResource(R.string.play_again),
                     onClick = onRetry,
                     modifier = Modifier.padding(top = 12.dp)
                 )
             } else {
-                GameButton(text = "Play Again", onClick = onRetry)
+                GameButton(text = stringResource(R.string.play_again), onClick = onRetry)
             }
             SecondaryButton(
-                text = "Back",
+                text = stringResource(R.string.back),
                 onClick = onBack,
                 modifier = Modifier.padding(top = 12.dp)
             )
             if (showShare) {
                 SecondaryButton(
-                    text = "Share Score",
+                    text = stringResource(R.string.share_score),
                     onClick = { sharing = true },
                     modifier = Modifier.padding(top = 12.dp)
                 )
             }
         }
 
-        // Off-screen card used to render the share image.
         if (showShare) {
             Box(
                 modifier = Modifier

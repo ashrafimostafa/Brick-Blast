@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.mostafa.brickblast.domain.model.AppSettings
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,7 @@ class SettingsDataStore @Inject constructor(
         val TRAJECTORY = booleanPreferencesKey("show_trajectory")
         val PARTICLES = booleanPreferencesKey("particle_effects")
         val DARK_THEME = booleanPreferencesKey("dark_theme")
+        val LANGUAGE_TAG = stringPreferencesKey("language_tag")
     }
 
     private fun fromPrefs(prefs: Preferences) = AppSettings(
@@ -33,7 +35,8 @@ class SettingsDataStore @Inject constructor(
         vibrationEnabled = prefs[Keys.VIBRATION] ?: true,
         showTrajectory = prefs[Keys.TRAJECTORY] ?: true,
         particleEffects = prefs[Keys.PARTICLES] ?: true,
-        darkTheme = prefs[Keys.DARK_THEME] ?: true
+        darkTheme = prefs[Keys.DARK_THEME] ?: true,
+        languageTag = prefs[Keys.LANGUAGE_TAG]
     )
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { prefs -> fromPrefs(prefs) }
@@ -47,6 +50,11 @@ class SettingsDataStore @Inject constructor(
             prefs[Keys.TRAJECTORY] = updated.showTrajectory
             prefs[Keys.PARTICLES] = updated.particleEffects
             prefs[Keys.DARK_THEME] = updated.darkTheme
+            if (updated.languageTag != null) {
+                prefs[Keys.LANGUAGE_TAG] = updated.languageTag
+            } else {
+                prefs.remove(Keys.LANGUAGE_TAG)
+            }
         }
     }
 }

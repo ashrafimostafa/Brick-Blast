@@ -21,10 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mostafa.brickblast.R
 import com.mostafa.brickblast.domain.model.UpgradeType
 import com.mostafa.brickblast.ui.components.GameButton
 import com.mostafa.brickblast.ui.viewmodel.ShopViewModel
@@ -41,10 +43,10 @@ fun ShopScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shop") },
+                title = { Text(stringResource(R.string.shop_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -58,19 +60,44 @@ fun ShopScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Your Coins: $coins", color = Color(0xFFFFD600), fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            Text("Spend coins on permanent upgrades", color = Color.White.copy(0.6f), fontSize = 14.sp)
+            Text(
+                stringResource(R.string.shop_your_coins, coins),
+                color = Color(0xFFFFD600),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                stringResource(R.string.shop_subtitle),
+                color = Color.White.copy(0.6f),
+                fontSize = 14.sp
+            )
 
-            ShopItem("Ball Damage +1", "Level ${upgrades.ballDamageLevel}", upgrades.upgradeCost(UpgradeType.BALL_DAMAGE)) {
+            ShopItem(
+                stringResource(R.string.upgrade_ball_damage_plus),
+                stringResource(R.string.upgrade_level, upgrades.ballDamageLevel),
+                upgrades.upgradeCost(UpgradeType.BALL_DAMAGE)
+            ) {
                 viewModel.purchaseUpgrade(UpgradeType.BALL_DAMAGE)
             }
-            ShopItem("Starting Balls +1", "Level ${upgrades.startingBallsLevel}", upgrades.upgradeCost(UpgradeType.STARTING_BALLS)) {
+            ShopItem(
+                stringResource(R.string.upgrade_starting_balls_plus),
+                stringResource(R.string.upgrade_level, upgrades.startingBallsLevel),
+                upgrades.upgradeCost(UpgradeType.STARTING_BALLS)
+            ) {
                 viewModel.purchaseUpgrade(UpgradeType.STARTING_BALLS)
             }
-            ShopItem("Coin Multiplier", "Level ${upgrades.coinMultiplierLevel}", upgrades.upgradeCost(UpgradeType.COIN_MULTIPLIER)) {
+            ShopItem(
+                stringResource(R.string.upgrade_coin_multiplier),
+                stringResource(R.string.upgrade_level, upgrades.coinMultiplierLevel),
+                upgrades.upgradeCost(UpgradeType.COIN_MULTIPLIER)
+            ) {
                 viewModel.purchaseUpgrade(UpgradeType.COIN_MULTIPLIER)
             }
-            ShopItem("Critical Hit Chance", "Level ${upgrades.criticalHitLevel}", upgrades.upgradeCost(UpgradeType.CRITICAL_HIT)) {
+            ShopItem(
+                stringResource(R.string.upgrade_critical_hit_chance),
+                stringResource(R.string.upgrade_level, upgrades.criticalHitLevel),
+                upgrades.upgradeCost(UpgradeType.CRITICAL_HIT)
+            ) {
                 viewModel.purchaseUpgrade(UpgradeType.CRITICAL_HIT)
             }
         }
