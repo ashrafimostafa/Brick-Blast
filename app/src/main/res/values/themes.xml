@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.BrickBlast" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- AppCompatActivity requires an AppCompat theme; Compose handles visual styling. -->
+    <style name="Theme.BrickBlast" parent="Theme.AppCompat.DayNight.NoActionBar" />
 </resources>
