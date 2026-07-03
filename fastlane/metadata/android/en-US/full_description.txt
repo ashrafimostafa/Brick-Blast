@@ -11,8 +11,10 @@ Features:
 * Collectable extra balls that grow your arsenal every round
 * Power-ups: bomb, laser, multi-ball and double damage
 * Multiple modes: Classic, Challenge, Time Attack and Hardcore
+* Separate save slots per mode with full board restore on continue
+* English and Persian (Farsi) UI with Vazirmatn typography
 * Particle effects and satisfying brick-destruction animations
-* Light and dark themes with an animated theme switch
+* Light and dark themes
 * High-score tracking and statistics
 * Share your score as an image
 * Completely offline - no ads, no tracking, no internet permission

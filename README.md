@@ -66,10 +66,13 @@ sdk.dir=/path/to/Android/Sdk
 
 This project is prepared for [F-Droid](https://f-droid.org/) submission:
 
-- **License:** MIT (see [LICENSE](LICENSE))
+- **License:** MIT (see [LICENSE](LICENSE)); Vazirmatn font under [SIL OFL 1.1](licenses/Vazirmatn-OFL.txt)
 - **Metadata:** [metadata/com.mostafa.brickblast.yml](metadata/com.mostafa.brickblast.yml)
+- **Submission guide:** [docs/F-DROID.md](docs/F-DROID.md)
 - **Store listing:** [fastlane/metadata/android/en-US/](fastlane/metadata/android/en-US/)
 - **Screenshots:** [fastlane/metadata/android/en-US/images/phoneScreenshots/](fastlane/metadata/android/en-US/images/phoneScreenshots/)
+
+Current F-Droid target: **v1.3.0** (versionCode 6). Signed fdroid APK: [GitHub Releases](https://github.com/ashrafimostafa/Brick-Blast/releases).
 
 
 ## Project structure
