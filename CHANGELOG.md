@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Skip to next round button during a shot; balls animate back to the launcher before the next round begins
+
 ## v1.3.0
 
 - Persian (Farsi) UI with Vazir font for menus, settings, and in-game text

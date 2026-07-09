@@ -51,6 +51,7 @@
     <string name="hud_coins">Coins  %1$d</string>
     <string name="hud_time">Time  %1$ds</string>
     <string name="pause_game">Pause game</string>
+    <string name="cancel_shot">Skip to next round</string>
 
     <!-- Pause -->
     <string name="paused_title">Paused</string>
@@ -164,6 +165,7 @@
     <string name="a11y_phase_aiming_ready">Ready to aim. Drag upward on the game board to shoot.</string>
     <string name="a11y_phase_launching">Launching balls.</string>
     <string name="a11y_phase_simulating">Balls in play.</string>
+    <string name="a11y_phase_recalling">Recalling balls to launcher.</string>
     <string name="a11y_phase_round_end">Round ending.</string>
     <string name="a11y_phase_paused">Game paused.</string>
     <string name="a11y_phase_game_over">Game over.</string>

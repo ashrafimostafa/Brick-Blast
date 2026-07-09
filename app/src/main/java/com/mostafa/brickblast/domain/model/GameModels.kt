@@ -11,6 +11,7 @@ enum class GamePhase {
     AIMING,
     LAUNCHING,
     SIMULATING,
+    RECALLING,
     ROUND_END,
     PAUSED,
     GAME_OVER,

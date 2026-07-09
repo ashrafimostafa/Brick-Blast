@@ -124,7 +124,9 @@ class NativeGameRenderer(context: Context, density: Float) {
         val skipBallStroke = activeBalls > 20
         val skipBrickStroke = activeBalls > 15
         val skipBrickHp = activeBalls > 25
-        val skipParticles = activeBalls > 40 || engine.phase == GamePhase.LAUNCHING
+        val skipParticles = activeBalls > 40 ||
+            engine.phase == GamePhase.LAUNCHING ||
+            engine.phase == GamePhase.RECALLING
         val skipFloatText = heavyLoad
         val useRoundBricks = !heavyLoad
 

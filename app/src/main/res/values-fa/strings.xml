@@ -51,6 +51,7 @@
     <string name="hud_coins">سکه  %1$d</string>
     <string name="hud_time">زمان  %1$dث</string>
     <string name="pause_game">توقف بازی</string>
+    <string name="cancel_shot">رفتن به دور بعد</string>
 
     <!-- Pause -->
     <string name="paused_title">متوقف شد</string>
@@ -164,6 +165,7 @@
     <string name="a11y_phase_aiming_ready">آماده هدف‌گیری. روی صفحه بازی به بالا بکشید.</string>
     <string name="a11y_phase_launching">در حال پرتاب توپ‌ها.</string>
     <string name="a11y_phase_simulating">توپ‌ها در حال بازی.</string>
+    <string name="a11y_phase_recalling">بازگرداندن توپ‌ها به پرتاب‌گر.</string>
     <string name="a11y_phase_round_end">پایان دور.</string>
     <string name="a11y_phase_paused">بازی متوقف شد.</string>
     <string name="a11y_phase_game_over">بازی تمام شد.</string>

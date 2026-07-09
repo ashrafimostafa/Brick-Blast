@@ -396,6 +396,88 @@ class GameEngine(private val context: Context) {
         onShoot?.invoke()
     }
 
+    /** Begins recalling all balls to the launcher; round advances once they arrive. */
+    fun cancelShot(): Boolean {
+        if (phase != GamePhase.LAUNCHING && phase != GamePhase.SIMULATING) return false
+
+        if (!hasNextLauncher) {
+            for (b in balls) {
+                if (b.launched && !b.active) {
+                    nextLauncherX = b.x.coerceIn(bounds.left + 14f, bounds.right - 14f)
+                    hasNextLauncher = true
+                    break
+                }
+            }
+        }
+
+        launchQueueIndex = balls.size
+        unlaunchedBallCount = 0
+        isAiming = false
+        physics.resetAccumulator()
+        particles.clear()
+        floatingTexts.clear()
+
+        for (ball in balls) {
+            ball.vx = 0f
+            ball.vy = 0f
+            when {
+                !ball.launched -> {
+                    ball.x = launcherX
+                    ball.y = launcherY
+                    ball.active = false
+                }
+                !ball.active -> ball.active = true
+            }
+        }
+
+        phase = GamePhase.RECALLING
+        updateActiveBallCount()
+        return true
+    }
+
+    private fun updateBallRecall(dt: Float) {
+        val targetX = launcherX
+        val targetY = launcherY
+        var anyMoving = false
+
+        for (ball in balls) {
+            if (!ball.launched || !ball.active) continue
+
+            val dx = targetX - ball.x
+            val dy = targetY - ball.y
+            val distSq = dx * dx + dy * dy
+            if (distSq < RECALL_ARRIVE_RADIUS * RECALL_ARRIVE_RADIUS) {
+                ball.x = targetX
+                ball.y = targetY
+                ball.active = false
+                ball.vx = 0f
+                ball.vy = 0f
+                continue
+            }
+
+            anyMoving = true
+            val dist = kotlin.math.sqrt(distSq)
+            val move = (RECALL_SPEED * dt).coerceAtMost(dist)
+            ball.x += dx / dist * move
+            ball.y += dy / dist * move
+        }
+
+        updateActiveBallCount()
+        if (!anyMoving) {
+            finishCanceledRound()
+        }
+    }
+
+    private fun finishCanceledRound() {
+        for (ball in balls) {
+            ball.active = false
+            ball.vx = 0f
+            ball.vy = 0f
+        }
+        activeBallCount = 0
+        endRound()
+    }
+
     private fun resetBallsForAim() {
         balls.clear()
         nextBallId = 0
@@ -491,6 +573,10 @@ class GameEngine(private val context: Context) {
                 if (!anyActive) {
                     endRound()
                 }
+                return true
+            }
+            GamePhase.RECALLING -> {
+                updateBallRecall(dt)
                 return true
             }
             else -> return false
@@ -868,6 +954,8 @@ class GameEngine(private val context: Context) {
         private const val BALL_DIAMETER = BALL_RADIUS * 2f
         private const val BRICK_GAP = 8f
         private const val LAUNCHER_ANIM_DURATION = 0.30f
+        private const val RECALL_SPEED = 1600f
+        private const val RECALL_ARRIVE_RADIUS = 6f
         /** Slightly faster pacing for balls, launches, animations, and timers. */
         private const val GAME_SPEED = 1.1f
         private val EMPTY_TRAJECTORY = FloatArray(0)

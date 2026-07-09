@@ -34,6 +34,7 @@ object GameAccessibility {
             else context.getString(R.string.a11y_phase_aiming_ready)
         GamePhase.LAUNCHING -> context.getString(R.string.a11y_phase_launching)
         GamePhase.SIMULATING -> context.getString(R.string.a11y_phase_simulating)
+        GamePhase.RECALLING -> context.getString(R.string.a11y_phase_recalling)
         GamePhase.ROUND_END -> context.getString(R.string.a11y_phase_round_end)
         GamePhase.PAUSED -> context.getString(R.string.a11y_phase_paused)
         GamePhase.GAME_OVER -> context.getString(R.string.a11y_phase_game_over)

@@ -204,7 +204,9 @@ class GameViewModel @Inject constructor(
         val phaseChanged = engine.phase != current.phase
         val aimingChanged = engine.isAiming != current.isAiming
         val ballsChanged = engine.totalBalls != current.totalBalls
-        val simulating = engine.phase == GamePhase.SIMULATING || engine.phase == GamePhase.LAUNCHING
+        val simulating = engine.phase == GamePhase.SIMULATING ||
+            engine.phase == GamePhase.LAUNCHING ||
+            engine.phase == GamePhase.RECALLING
         val now = System.nanoTime()
         val hudDue = !simulating || now - lastHudUpdateNanos >= 250_000_000L
 
@@ -259,6 +261,17 @@ class GameViewModel @Inject constructor(
     fun onDragEnd() {
         engine.releaseAim()
         _uiState.update { it.copy(isAiming = engine.isAiming) }
+    }
+
+    fun cancelShot() {
+        if (!running) return
+        if (!engine.cancelShot()) return
+        _uiState.update {
+            it.copy(
+                phase = engine.phase,
+                isAiming = false
+            )
+        }
     }
 
     fun pause() {

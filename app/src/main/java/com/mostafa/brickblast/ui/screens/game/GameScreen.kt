@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -53,6 +54,7 @@ fun GameScreen(
     val context = LocalContext.current
     val persianUi = LocalConfiguration.current.locales[0].language == "fa"
     val pauseLabel = stringResource(R.string.pause_game)
+    val cancelShotLabel = stringResource(R.string.cancel_shot)
     val isDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var lastReportedPhase by remember(mode, challengeLevel, continueGame) {
@@ -150,6 +152,18 @@ fun GameScreen(
                 .semantics { contentDescription = pauseLabel }
         ) {
             Icon(Icons.Default.Pause, contentDescription = null)
+        }
+
+        if (uiState.phase == GamePhase.LAUNCHING || uiState.phase == GamePhase.SIMULATING) {
+            FloatingActionButton(
+                onClick = { viewModel.cancelShot() },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 28.dp)
+                    .semantics { contentDescription = cancelShotLabel }
+            ) {
+                Icon(Icons.Default.SkipNext, contentDescription = null)
+            }
         }
 
         if (uiState.newAchievements.isNotEmpty()) {
