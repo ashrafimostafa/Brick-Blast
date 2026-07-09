@@ -83,6 +83,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun toggleAchievementAutoDismiss(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateSettings { it.copy(achievementAutoDismiss = enabled) }
+        }
+    }
+
     fun toggleDarkTheme(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateSettings { it.copy(darkTheme = enabled) }
@@ -120,6 +126,18 @@ class StatisticsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val topScores = highScoreRepository.getTopScores(10)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+}
+
+@HiltViewModel
+class AchievementsViewModel @Inject constructor(
+    private val playerRepository: PlayerRepository
+) : ViewModel() {
+    val achievements = playerRepository.achievements
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    init {
+        viewModelScope.launch { playerRepository.refreshAchievements() }
+    }
 }
 
 @HiltViewModel

@@ -3,6 +3,10 @@
 ## Unreleased
 
 - Skip to next round button during a shot; balls animate back to the launcher before the next round begins
+- Achievements menu with 54 milestones (rounds up to 1M, bricks, coins, balls, play time, games played)
+- Share unlocked achievements as images
+- Improved unlock popup with animation, sound, close button, and optional auto-close (Settings)
+- Earned and locked lists show a preview with View more (top 3 earned, next 5 locked)
 
 ## v1.3.0
 

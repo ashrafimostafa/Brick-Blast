@@ -37,6 +37,7 @@ data class PlayerStatistics(
 
 data class Achievement(
     val id: String,
+    val metric: AchievementMetric,
     val title: String,
     val description: String,
     val target: Long,
@@ -44,15 +45,6 @@ data class Achievement(
     var unlocked: Boolean = false,
     val unlockedAt: Long? = null
 )
-
-object AchievementDefinitions {
-    val ALL = listOf(
-        Achievement("destroy_100_bricks", "Brick Breaker", "Destroy 100 bricks", 100),
-        Achievement("reach_round_50", "Half Century", "Reach Round 50", 50),
-        Achievement("collect_500_coins", "Coin Collector", "Collect 500 coins", 500),
-        Achievement("own_50_balls", "Ball Hoarder", "Own 50 balls", 50)
-    )
-}
 
 data class GameSaveState(
     val round: Int = 1,
@@ -76,6 +68,7 @@ data class AppSettings(
     val vibrationEnabled: Boolean = true,
     val showTrajectory: Boolean = true,
     val particleEffects: Boolean = true,
+    val achievementAutoDismiss: Boolean = true,
     val darkTheme: Boolean = true,
     /** null = follow system language; otherwise BCP-47 tag such as "en" or "fa". */
     val languageTag: String? = null

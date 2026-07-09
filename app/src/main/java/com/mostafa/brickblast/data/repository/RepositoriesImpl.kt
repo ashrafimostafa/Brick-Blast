@@ -17,6 +17,7 @@ import com.mostafa.brickblast.data.local.entity.PlayerUpgradesEntity
 import com.mostafa.brickblast.data.local.entity.PlayerWalletEntity
 import com.mostafa.brickblast.domain.model.Achievement
 import com.mostafa.brickblast.domain.model.AchievementDefinitions
+import com.mostafa.brickblast.domain.model.AchievementSnapshot
 import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.model.ChallengeProgress
 import com.mostafa.brickblast.domain.model.GameMode
@@ -67,8 +68,10 @@ class PlayerRepositoryImpl @Inject constructor(
     }
 
     override val achievements: Flow<List<Achievement>> = achievementDao.getAll().map { list ->
-        if (list.isEmpty()) AchievementDefinitions.ALL
-        else list.map { it.toDomain() }
+        val byId = list.associateBy { it.id }
+        AchievementDefinitions.ALL.map { def ->
+            byId[def.id]?.toDomain() ?: AchievementDefinitions.toAchievement(def)
+        }
     }
 
     override suspend fun getCoins(): Long {
@@ -120,29 +123,23 @@ class PlayerRepositoryImpl @Inject constructor(
         statsDao.upsert(transform(current).toEntity())
     }
 
-    override suspend fun checkAchievements(
-        bricksDestroyed: Long,
-        round: Int,
-        coins: Long,
-        balls: Int
-    ): List<Achievement> {
-        ensureAchievements()
-        val entities = achievementDao.getAll()
+    override suspend fun checkAchievements(snapshot: AchievementSnapshot): List<Achievement> {
+        syncAchievementDefinitions()
         val newlyUnlocked = mutableListOf<Achievement>()
-        // Note: we read synchronously via a one-shot; in production use first()
-        // For simplicity, update each achievement type
         val all = achievementDao.getAll().first()
         for (entity in all) {
-            val newProgress = when (entity.id) {
-                "destroy_100_bricks" -> maxOf(entity.progress, bricksDestroyed)
-                "reach_round_50" -> maxOf(entity.progress, round.toLong())
-                "collect_500_coins" -> maxOf(entity.progress, coins)
-                "own_50_balls" -> maxOf(entity.progress, balls.toLong())
-                else -> entity.progress
-            }
+            val metric = AchievementDefinitions.metricFor(entity.id)
+            val currentValue = AchievementDefinitions.progressFor(metric, snapshot)
+            val newProgress = maxOf(entity.progress, currentValue)
             val unlocked = entity.unlocked || newProgress >= entity.target
             if (unlocked && !entity.unlocked) {
-                newlyUnlocked.add(entity.copy(progress = newProgress, unlocked = true, unlockedAt = System.currentTimeMillis()).toDomain())
+                newlyUnlocked.add(
+                    entity.copy(
+                        progress = newProgress,
+                        unlocked = true,
+                        unlockedAt = System.currentTimeMillis()
+                    ).toDomain()
+                )
             }
             achievementDao.updateProgress(
                 entity.id,
@@ -152,6 +149,64 @@ class PlayerRepositoryImpl @Inject constructor(
             )
         }
         return newlyUnlocked
+    }
+
+    override suspend fun refreshAchievements() {
+        val stats = getStatistics()
+        checkAchievements(
+            AchievementSnapshot(
+                bricksDestroyed = stats.totalBricksDestroyed,
+                highestRound = stats.highestRound.toLong(),
+                coins = stats.totalCoinsEarned,
+                ballsOwned = 0,
+                playTimeMs = stats.totalPlayTimeMs,
+                gamesPlayed = stats.totalGamesPlayed.toLong()
+            )
+        )
+    }
+
+    private suspend fun syncAchievementDefinitions() {
+        val byId = achievementDao.getAll().first().associateBy { it.id }.toMutableMap()
+        val upserts = mutableListOf<AchievementEntity>()
+
+        val legacyMap = mapOf(
+            "destroy_100_bricks" to "bricks_100",
+            "reach_round_50" to "round_50",
+            "collect_500_coins" to "coins_500",
+            "own_50_balls" to "balls_50"
+        )
+
+        for ((legacyId, canonicalId) in legacyMap) {
+            val legacy = byId.remove(legacyId) ?: continue
+            val canonical = byId[canonicalId]
+            val merged = if (canonical == null) {
+                legacy.copy(id = canonicalId)
+            } else {
+                canonical.copy(
+                    progress = maxOf(canonical.progress, legacy.progress),
+                    unlocked = canonical.unlocked || legacy.unlocked,
+                    unlockedAt = canonical.unlockedAt ?: legacy.unlockedAt
+                )
+            }
+            byId[canonicalId] = merged
+            upserts.add(merged)
+        }
+
+        for (def in AchievementDefinitions.ALL) {
+            if (def.id !in byId) {
+                val entity = AchievementDefinitions.toAchievement(def).toEntity()
+                byId[def.id] = entity
+                upserts.add(entity)
+            }
+        }
+
+        if (upserts.isNotEmpty()) {
+            achievementDao.insertAll(upserts)
+        }
+
+        byId.keys
+            .filter { id -> AchievementDefinitions.ALL.none { it.id == id } }
+            .forEach { achievementDao.deleteById(it) }
     }
 
     private suspend fun ensureWallet() {
@@ -173,12 +228,7 @@ class PlayerRepositoryImpl @Inject constructor(
     }
 
     private suspend fun ensureAchievements() {
-        val all = achievementDao.getAll().first()
-        if (all.isEmpty()) {
-            achievementDao.insertAll(
-                AchievementDefinitions.ALL.map { it.toEntity() }
-            )
-        }
+        syncAchievementDefinitions()
     }
 
     private fun PlayerUpgradesEntity.toDomain() = PlayerUpgrades(
@@ -205,8 +255,20 @@ class PlayerRepositoryImpl @Inject constructor(
         totalGamesPlayed = totalGamesPlayed
     )
 
-    private fun AchievementEntity.toDomain() = Achievement(id, title, description, target, progress, unlocked, unlockedAt)
-    private fun Achievement.toEntity() = AchievementEntity(id, title, description, target, progress, unlocked, unlockedAt)
+    private fun AchievementEntity.toDomain() = Achievement(
+        id = id,
+        metric = AchievementDefinitions.metricFor(id),
+        title = title,
+        description = description,
+        target = target,
+        progress = progress,
+        unlocked = unlocked,
+        unlockedAt = unlockedAt
+    )
+
+    private fun Achievement.toEntity() = AchievementEntity(
+        id, title, description, target, progress, unlocked, unlockedAt
+    )
 }
 
 @Singleton

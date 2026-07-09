@@ -1,6 +1,7 @@
 package com.mostafa.brickblast.domain.repository
 
 import com.mostafa.brickblast.domain.model.Achievement
+import com.mostafa.brickblast.domain.model.AchievementSnapshot
 import com.mostafa.brickblast.domain.model.AppSettings
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GameSaveState
@@ -28,12 +29,8 @@ interface PlayerRepository {
     suspend fun upgrade(type: UpgradeType): Boolean
     suspend fun getStatistics(): PlayerStatistics
     suspend fun updateStatistics(transform: (PlayerStatistics) -> PlayerStatistics)
-    suspend fun checkAchievements(
-        bricksDestroyed: Long = 0,
-        round: Int = 0,
-        coins: Long = 0,
-        balls: Int = 0
-    ): List<Achievement>
+    suspend fun checkAchievements(snapshot: AchievementSnapshot): List<Achievement>
+    suspend fun refreshAchievements()
 }
 
 interface GameSaveRepository {

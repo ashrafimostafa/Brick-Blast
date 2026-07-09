@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.mostafa.brickblast.domain.model.GameMode
+import com.mostafa.brickblast.ui.screens.achievements.AchievementsScreen
 import com.mostafa.brickblast.ui.screens.challenge.ChallengeSelectScreen
 import com.mostafa.brickblast.ui.viewmodel.ChallengeViewModel
 import com.mostafa.brickblast.ui.screens.game.GameOverScreen
@@ -62,6 +63,7 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 onHardcore = { navController.navigate(GameRoute(mode = "HARDCORE")) },
                 onSettings = { navController.navigate(SettingsRoute) },
                 onStatistics = { navController.navigate(StatisticsRoute) },
+                onAchievements = { navController.navigate(AchievementsRoute) },
                 onContinue = {
                     scope.launch {
                         val save = vm.getRecentSave() ?: return@launch
@@ -138,7 +140,14 @@ fun BrickBlastNavGraph(navController: NavHostController) {
         }
 
         composable<StatisticsRoute> {
-            StatisticsScreen(onBack = { navController.popBackStack() })
+            StatisticsScreen(
+                onBack = { navController.popBackStack() },
+                onAchievements = { navController.navigate(AchievementsRoute) }
+            )
+        }
+
+        composable<AchievementsRoute> {
+            AchievementsScreen(onBack = { navController.popBackStack() })
         }
 
         composable<ShopRoute> {

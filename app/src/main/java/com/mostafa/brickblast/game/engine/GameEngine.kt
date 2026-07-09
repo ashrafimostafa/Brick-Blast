@@ -212,6 +212,8 @@ class GameEngine(private val context: Context) {
         launcherAnimating = false
         launcherAnimT = 1f
         sessionStartTime = System.currentTimeMillis()
+        bricksDestroyedTotal = 0L
+        ballsLaunchedTotal = 0L
         resetBallsForAim()
         markBricksChanged()
         phase = GamePhase.AIMING

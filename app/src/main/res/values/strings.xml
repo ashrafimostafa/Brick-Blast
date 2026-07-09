@@ -13,6 +13,7 @@
     <string name="menu_time_attack">Time Attack</string>
     <string name="menu_hardcore">Hardcore</string>
     <string name="menu_statistics">Statistics</string>
+    <string name="menu_achievements">Achievements</string>
     <string name="menu_settings">Settings</string>
 
     <!-- Game modes -->
@@ -42,6 +43,7 @@
     <string name="settings_vibration">Vibration</string>
     <string name="settings_trajectory_preview">Trajectory Preview</string>
     <string name="settings_particle_effects">Particle Effects</string>
+    <string name="settings_achievement_auto_dismiss">Auto-close achievement popup</string>
 
     <!-- Game HUD -->
     <string name="hud_best">BEST  %1$d</string>
@@ -104,11 +106,22 @@
     <string name="high_score_entry">#%1$d %2$s</string>
     <string name="high_score_value">%1$d (R%2$d)</string>
     <string name="achievements">Achievements</string>
-    <string name="achievement_progress">%1$d/%2$d</string>
+    <string name="achievements_title">Achievements</string>
+    <string name="achievements_summary">%1$d of %2$d unlocked</string>
+    <string name="achievements_earned_short">%1$d earned</string>
+    <string name="achievements_next">Next up</string>
+    <string name="achievements_earned">Earned</string>
+    <string name="achievements_locked">Still locked</string>
+    <string name="view_all_achievements">View all achievements</string>
+    <string name="view_more">View more</string>
+    <string name="view_less">Show less</string>
+    <string name="achievement_progress">%1$s / %2$s</string>
+    <string name="achievement_progress_playtime">%1$s / %2$s</string>
     <string name="stat_line">%1$s: %2$s</string>
     <string name="stat_line_a11y">%1$s, %2$s</string>
     <string name="play_time_hours_minutes">%1$dh %2$dm</string>
     <string name="play_time_minutes">%1$dm</string>
+    <string name="play_time_days_hours">%1$dd %2$dh</string>
 
     <!-- Shop -->
     <string name="shop_title">Shop</string>
@@ -130,15 +143,27 @@
 
     <!-- Achievements -->
     <string name="achievement_unlocked">Achievement Unlocked!</string>
+    <string name="achievement_auto_close_hint">Closes automatically in a few seconds</string>
+    <string name="close">Close</string>
+    <string name="continue_playing">Continue</string>
     <string name="achievement_unlocked_announcement">Achievement unlocked: %1$s. %2$s</string>
-    <string name="achievement_brick_breaker_title">Brick Breaker</string>
-    <string name="achievement_brick_breaker_desc">Destroy 100 bricks</string>
-    <string name="achievement_half_century_title">Half Century</string>
-    <string name="achievement_half_century_desc">Reach Round 50</string>
-    <string name="achievement_coin_collector_title">Coin Collector</string>
-    <string name="achievement_coin_collector_desc">Collect 500 coins</string>
-    <string name="achievement_ball_hoarder_title">Ball Hoarder</string>
-    <string name="achievement_ball_hoarder_desc">Own 50 balls</string>
+    <string name="achievement_unlocked_on">Unlocked on %1$s</string>
+    <string name="achievement_round_title">Round %1$s</string>
+    <string name="achievement_round_desc">Reach round %1$s in any game mode</string>
+    <string name="achievement_round_million_title">Million Rounds</string>
+    <string name="achievement_round_million_desc">Reach round 1,000,000 — the ultimate milestone</string>
+    <string name="achievement_bricks_title">Brick Breaker %1$s</string>
+    <string name="achievement_bricks_desc">Destroy %1$s bricks in total</string>
+    <string name="achievement_coins_title">Coin Hoarder %1$s</string>
+    <string name="achievement_coins_desc">Earn %1$s coins in total</string>
+    <string name="achievement_balls_title">Ball Army %1$s</string>
+    <string name="achievement_balls_desc">Own %1$s balls in a single game</string>
+    <string name="achievement_playtime_title">Dedicated %1$s</string>
+    <string name="achievement_playtime_desc">Play for %1$s in total</string>
+    <string name="achievement_games_title">Veteran %1$s</string>
+    <string name="achievement_games_desc">Complete %1$s games</string>
+    <string name="share_achievement">Share achievement</string>
+    <string name="share_achievement_text">I unlocked "%1$s" in Brick Blast! %2$s</string>
 
     <!-- Share -->
     <string name="share_score_text">I scored %1$d points on round %2$d in Brick Blast (%3$s)! Can you beat me?</string>

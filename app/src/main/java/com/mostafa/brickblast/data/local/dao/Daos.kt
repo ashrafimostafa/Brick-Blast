@@ -34,6 +34,9 @@ interface AchievementDao {
 
     @Query("UPDATE achievements SET progress = :progress, unlocked = :unlocked, unlockedAt = :unlockedAt WHERE id = :id")
     suspend fun updateProgress(id: String, progress: Long, unlocked: Boolean, unlockedAt: Long?)
+
+    @Query("DELETE FROM achievements WHERE id = :id")
+    suspend fun deleteById(id: String)
 }
 
 @Dao

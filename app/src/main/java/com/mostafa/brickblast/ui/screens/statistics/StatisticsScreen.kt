@@ -30,17 +30,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostafa.brickblast.R
 import com.mostafa.brickblast.ui.accessibility.screenHeading
 import com.mostafa.brickblast.ui.util.gameModeLabel
-import com.mostafa.brickblast.ui.util.localizedTitle
+import com.mostafa.brickblast.ui.components.SecondaryButton
 import com.mostafa.brickblast.ui.viewmodel.StatisticsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsScreen(
     onBack: () -> Unit,
+    onAchievements: () -> Unit,
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
     val stats by viewModel.statistics.collectAsState()
     val achievements by viewModel.achievements.collectAsState()
+    val earnedCount = achievements.count { it.unlocked }
     val topScores by viewModel.topScores.collectAsState()
     val navigateBackLabel = stringResource(R.string.navigate_back)
 
@@ -109,14 +111,15 @@ fun StatisticsScreen(
                     .padding(top = 16.dp)
                     .screenHeading()
             )
-            achievements.forEach { a ->
-                val status = if (a.unlocked) {
-                    "✓"
-                } else {
-                    stringResource(R.string.achievement_progress, a.progress, a.target)
-                }
-                StatLine(a.localizedTitle(), status)
-            }
+            StatLine(
+                stringResource(R.string.achievements_summary, earnedCount, achievements.size),
+                stringResource(R.string.achievements_earned_short, earnedCount)
+            )
+            SecondaryButton(
+                text = stringResource(R.string.view_all_achievements),
+                onClick = onAchievements,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }

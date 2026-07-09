@@ -16,7 +16,8 @@ enum class SoundEffect {
     DESTROY,
     COLLECT,
     GAME_OVER,
-    POWER_UP
+    POWER_UP,
+    ACHIEVEMENT
 }
 
 /**
@@ -56,6 +57,18 @@ class AudioManager @Inject constructor(
 
     fun play(effect: SoundEffect) {
         if (!soundEnabled) return
+        when (effect) {
+            SoundEffect.ACHIEVEMENT -> {
+                toneGenerator.startTone(ToneGenerator.TONE_CDMA_ANSWER, 120)
+                handler.postDelayed({
+                    if (soundEnabled) {
+                        toneGenerator.startTone(ToneGenerator.TONE_CDMA_CONFIRM, 140)
+                    }
+                }, 130L)
+                return
+            }
+            else -> Unit
+        }
         val tone = when (effect) {
             SoundEffect.SHOOT -> ToneGenerator.TONE_PROP_BEEP
             SoundEffect.BOUNCE -> ToneGenerator.TONE_PROP_BEEP2
@@ -63,6 +76,7 @@ class AudioManager @Inject constructor(
             SoundEffect.COLLECT -> ToneGenerator.TONE_CDMA_CONFIRM
             SoundEffect.GAME_OVER -> ToneGenerator.TONE_CDMA_ABBR_ALERT
             SoundEffect.POWER_UP -> ToneGenerator.TONE_CDMA_ONE_MIN_BEEP
+            SoundEffect.ACHIEVEMENT -> ToneGenerator.TONE_CDMA_ANSWER
         }
         val duration = when (effect) {
             SoundEffect.DESTROY, SoundEffect.GAME_OVER -> 200

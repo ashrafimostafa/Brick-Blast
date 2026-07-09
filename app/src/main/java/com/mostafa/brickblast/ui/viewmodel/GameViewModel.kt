@@ -12,6 +12,7 @@ import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GamePhase
 import com.mostafa.brickblast.data.local.GameStateSerializer
 import com.mostafa.brickblast.domain.model.GameSaveState
+import com.mostafa.brickblast.domain.model.AchievementSnapshot
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
 import com.mostafa.brickblast.domain.repository.ChallengeRepository
@@ -41,6 +42,7 @@ data class GameUiState(
     val timeRemaining: Float? = null,
     val showTrajectory: Boolean = true,
     val particleEffects: Boolean = true,
+    val achievementAutoDismiss: Boolean = true,
     val newAchievements: List<Achievement> = emptyList(),
     val screenWidth: Float = 1080f,
     val screenHeight: Float = 1920f,
@@ -165,6 +167,7 @@ class GameViewModel @Inject constructor(
                     phase = engine.phase,
                     showTrajectory = settings.showTrajectory,
                     particleEffects = settings.particleEffects,
+                    achievementAutoDismiss = settings.achievementAutoDismiss,
                     timeRemaining = if (mode == GameMode.TIME_ATTACK) engine.timeAttackRemaining else null
                 )
             }
@@ -353,20 +356,33 @@ class GameViewModel @Inject constructor(
         checkAchievements()
     }
 
-    private suspend fun checkAchievements() {
-        val unlocked = playerRepository.checkAchievements(
-            bricksDestroyed = engine.bricksDestroyedTotal,
-            round = engine.round,
-            coins = playerRepository.getCoins(),
-            balls = engine.totalBalls
+    private suspend fun buildAchievementSnapshot(): AchievementSnapshot {
+        val stats = playerRepository.getStatistics()
+        return AchievementSnapshot(
+            bricksDestroyed = stats.totalBricksDestroyed + engine.bricksDestroyedTotal,
+            highestRound = maxOf(stats.highestRound.toLong(), engine.round.toLong()),
+            coins = stats.totalCoinsEarned + engine.coinsThisSession.toLong(),
+            ballsOwned = engine.totalBalls.toLong(),
+            playTimeMs = stats.totalPlayTimeMs + engine.getPlayTimeMs(),
+            gamesPlayed = stats.totalGamesPlayed.toLong()
         )
+    }
+
+    private suspend fun checkAchievements() {
+        val unlocked = playerRepository.checkAchievements(buildAchievementSnapshot())
         if (unlocked.isNotEmpty()) {
-            _uiState.update { it.copy(newAchievements = unlocked) }
+            audioManager.play(SoundEffect.ACHIEVEMENT)
+            _uiState.update { state ->
+                val merged = (state.newAchievements + unlocked).distinctBy { it.id }
+                state.copy(newAchievements = merged)
+            }
         }
     }
 
     fun dismissAchievement() {
-        _uiState.update { it.copy(newAchievements = emptyList()) }
+        _uiState.update { state ->
+            state.copy(newAchievements = state.newAchievements.drop(1))
+        }
     }
 
     fun watchAdToContinue(activity: Activity) {

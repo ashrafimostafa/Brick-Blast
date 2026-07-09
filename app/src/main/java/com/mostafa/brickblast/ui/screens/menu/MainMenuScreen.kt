@@ -30,6 +30,7 @@ fun MainMenuScreen(
     onHardcore: () -> Unit,
     onSettings: () -> Unit,
     onStatistics: () -> Unit,
+    onAchievements: () -> Unit,
     onContinue: () -> Unit
 ) {
     val titleColor = MaterialTheme.colorScheme.primary
@@ -64,6 +65,8 @@ fun MainMenuScreen(
         SecondaryButton(text = stringResource(R.string.menu_hardcore), onClick = onHardcore)
         Spacer(modifier = Modifier.height(12.dp))
         SecondaryButton(text = stringResource(R.string.menu_statistics), onClick = onStatistics)
+        Spacer(modifier = Modifier.height(12.dp))
+        SecondaryButton(text = stringResource(R.string.menu_achievements), onClick = onAchievements)
         Spacer(modifier = Modifier.height(12.dp))
         SecondaryButton(text = stringResource(R.string.menu_settings), onClick = onSettings)
     }

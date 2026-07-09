@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable object SettingsRoute
 @Serializable object UpgradeRoute
 @Serializable object StatisticsRoute
+@Serializable object AchievementsRoute
 @Serializable object ShopRoute
 @Serializable data class GameOverRoute(
     val score: Int,

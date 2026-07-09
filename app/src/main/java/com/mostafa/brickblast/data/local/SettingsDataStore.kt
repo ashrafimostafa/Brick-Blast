@@ -25,6 +25,7 @@ class SettingsDataStore @Inject constructor(
         val VIBRATION = booleanPreferencesKey("vibration_enabled")
         val TRAJECTORY = booleanPreferencesKey("show_trajectory")
         val PARTICLES = booleanPreferencesKey("particle_effects")
+        val ACHIEVEMENT_AUTO_DISMISS = booleanPreferencesKey("achievement_auto_dismiss")
         val DARK_THEME = booleanPreferencesKey("dark_theme")
         val LANGUAGE_TAG = stringPreferencesKey("language_tag")
     }
@@ -35,6 +36,7 @@ class SettingsDataStore @Inject constructor(
         vibrationEnabled = prefs[Keys.VIBRATION] ?: true,
         showTrajectory = prefs[Keys.TRAJECTORY] ?: true,
         particleEffects = prefs[Keys.PARTICLES] ?: true,
+        achievementAutoDismiss = prefs[Keys.ACHIEVEMENT_AUTO_DISMISS] ?: true,
         darkTheme = prefs[Keys.DARK_THEME] ?: true,
         languageTag = prefs[Keys.LANGUAGE_TAG]
     )
@@ -49,6 +51,7 @@ class SettingsDataStore @Inject constructor(
             prefs[Keys.VIBRATION] = updated.vibrationEnabled
             prefs[Keys.TRAJECTORY] = updated.showTrajectory
             prefs[Keys.PARTICLES] = updated.particleEffects
+            prefs[Keys.ACHIEVEMENT_AUTO_DISMISS] = updated.achievementAutoDismiss
             prefs[Keys.DARK_THEME] = updated.darkTheme
             if (updated.languageTag != null) {
                 prefs[Keys.LANGUAGE_TAG] = updated.languageTag

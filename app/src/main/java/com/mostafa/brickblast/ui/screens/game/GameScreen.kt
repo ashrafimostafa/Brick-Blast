@@ -170,9 +170,8 @@ fun GameScreen(
             AchievementPopup(
                 achievements = uiState.newAchievements,
                 onDismiss = { viewModel.dismissAchievement() },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 100.dp)
+                autoDismissEnabled = uiState.achievementAutoDismiss,
+                modifier = Modifier.fillMaxSize()
             )
         }
 

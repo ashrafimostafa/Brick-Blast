@@ -131,6 +131,10 @@ fun SettingsScreen(
                 stringResource(R.string.settings_particle_effects),
                 settings.particleEffects
             ) { viewModel.toggleParticles(it) }
+            SettingToggle(
+                stringResource(R.string.settings_achievement_auto_dismiss),
+                settings.achievementAutoDismiss
+            ) { viewModel.toggleAchievementAutoDismiss(it) }
         }
     }
 }
