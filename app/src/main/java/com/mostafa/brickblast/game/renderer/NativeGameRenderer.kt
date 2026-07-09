@@ -92,7 +92,10 @@ class NativeGameRenderer(context: Context, density: Float) {
     }
     private val trajPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val hpTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val hpTextPaint = Paint().apply {
+        isAntiAlias = false
+        isSubpixelText = false
+        isLinearText = false
         textAlign = Paint.Align.CENTER
         textSize = 14f * densityScale
         color = Color.WHITE
@@ -136,6 +139,8 @@ class NativeGameRenderer(context: Context, density: Float) {
 
     private var cachedIdleBalls = -1
     private var cachedIdleLabel = ""
+    private var cachedPersianUi = false
+    private val hpLabelCache = Array(101) { if (it == 0) "" else it.toString() }
 
     fun render(
         canvas: Canvas,
@@ -152,8 +157,9 @@ class NativeGameRenderer(context: Context, density: Float) {
         val voxelWorld = BoardFeature.VOXEL_WORLD_BG in theme.features
 
         val activeBalls = engine.activeBallCount
-        val heavyLoad = activeBalls > 30
-        val skipPremiumFx = heavyLoad || activeBalls > 20
+        val simulating = engine.phase == GamePhase.SIMULATING || engine.phase == GamePhase.LAUNCHING
+        val skipPremiumFx = activeBalls > 12 || (simulating && activeBalls > 6)
+        val heavyLoad = activeBalls > 42
 
         if (voxelWorld) {
             drawVoxelWorldBackground(canvas, w, h, timeSec, skipPremiumFx)
@@ -190,9 +196,14 @@ class NativeGameRenderer(context: Context, density: Float) {
             Color.argb(102, Color.red(ink), Color.green(ink), Color.blue(ink))
         }
         badgePaint.color = if (voxelWorld) Color.parseColor("#3E2723") else ink
-        badgePaint.typeface = if (persianUi) persianBoldTypeface else Typeface.DEFAULT_BOLD
-        hpTextPaint.typeface = if (persianUi) persianTypeface else Typeface.DEFAULT
-        floatTextPaint.typeface = if (persianUi) persianTypeface else Typeface.DEFAULT
+        if (persianUi != cachedPersianUi) {
+            cachedPersianUi = persianUi
+            val bold = if (persianUi) persianBoldTypeface else Typeface.DEFAULT_BOLD
+            val regular = if (persianUi) persianTypeface else Typeface.DEFAULT
+            badgePaint.typeface = bold
+            hpTextPaint.typeface = regular
+            floatTextPaint.typeface = regular
+        }
 
         ballPaint.color = theme.ballColor
         launcherPaint.color = theme.launcherColor
@@ -232,19 +243,17 @@ class NativeGameRenderer(context: Context, density: Float) {
         }
         canvas.drawLine(b.left, b.bottom, b.right, b.bottom, floorLinePaint)
 
-        val skipBallStroke = activeBalls > 20
-        val skipBrickStroke = activeBalls > 15
-        val skipBrickHp = activeBalls > 25
-        val skipParticles = activeBalls > 40 ||
+        val skipBallStroke = activeBalls > 28
+        val skipParticles = activeBalls > 45 ||
             engine.phase == GamePhase.LAUNCHING ||
             engine.phase == GamePhase.RECALLING
-        val skipFloatText = heavyLoad
+        val skipFloatText = true
         val blockyBricks = BoardFeature.BLOCKY_BRICKS in theme.features
-        val useRoundBricks = !heavyLoad && !blockyBricks
-        val glowBricks = BoardFeature.GLOW_BRICKS in theme.features && !skipBrickStroke
-        val shimmerBricks = BoardFeature.SHIMMER_HIGH_HP in theme.features && !skipBrickStroke
-        val ballGlow = BoardFeature.BALL_GLOW in theme.features && !skipPremiumFx
-        val launcherAura = BoardFeature.LAUNCHER_AURA in theme.features && !skipPremiumFx
+        val useRoundBricks = !blockyBricks
+        val glowBricks = BoardFeature.GLOW_BRICKS in theme.features && !simulating && activeBalls <= 8
+        val shimmerBricks = BoardFeature.SHIMMER_HIGH_HP in theme.features && !simulating && activeBalls <= 8
+        val ballGlow = BoardFeature.BALL_GLOW in theme.features && !skipPremiumFx && !simulating
+        val launcherAura = BoardFeature.LAUNCHER_AURA in theme.features && !skipPremiumFx && !simulating
 
         for (brick in engine.bricks) {
             if (brick.hp <= 0 && !brick.isDestroying) continue
@@ -252,7 +261,7 @@ class NativeGameRenderer(context: Context, density: Float) {
             val cy = brick.y + brick.height * 0.5f
 
             if (brick.isDestroying) {
-                drawDestroyingBrick(canvas, brick, cx, cy, heavyLoad, theme, timeSec, glowBricks, blockyBricks)
+                drawDestroyingBrick(canvas, brick, cx, cy, activeBalls > 48, theme, timeSec, glowBricks, blockyBricks)
                 continue
             }
 
@@ -262,9 +271,6 @@ class NativeGameRenderer(context: Context, density: Float) {
                 drawBlockyBrick(canvas, brickRect, brickFillPaint.color, brick.hp)
             } else if (useRoundBricks) {
                 canvas.drawRoundRect(brickRect, cornerRadius, cornerRadius, brickFillPaint)
-                if (!skipBrickStroke) {
-                    canvas.drawRoundRect(brickRect, cornerRadius, cornerRadius, brickStrokePaint)
-                }
                 if (glowBricks) {
                     drawBrickGlow(canvas, brickRect, brickFillPaint.color, cx, timeSec)
                 }
@@ -275,14 +281,14 @@ class NativeGameRenderer(context: Context, density: Float) {
                 canvas.drawRect(brickRect, brickFillPaint)
             }
 
-            if (!skipBrickHp) {
-                val textY = cy - (hpTextPaint.descent() + hpTextPaint.ascent()) * 0.5f
-                if (blockyBricks) {
-                    hpTextPaint.color = if (brick.hp >= 22) Color.WHITE else Color.parseColor("#3E2723")
-                }
-                canvas.drawText(brick.hp.toString(), cx, textY, hpTextPaint)
-                if (blockyBricks) hpTextPaint.color = Color.WHITE
+            val textY = cy - (hpTextPaint.descent() + hpTextPaint.ascent()) * 0.5f
+            val hpLabel = hpLabelCache[brick.hp.coerceIn(0, 100)]
+            if (blockyBricks) {
+                hpTextPaint.color = if (brick.hp >= 22) Color.WHITE else Color.parseColor("#3E2723")
+            } else {
+                hpTextPaint.color = Color.WHITE
             }
+            canvas.drawText(hpLabel, cx, textY, hpTextPaint)
         }
 
         for (c in engine.collectables) {

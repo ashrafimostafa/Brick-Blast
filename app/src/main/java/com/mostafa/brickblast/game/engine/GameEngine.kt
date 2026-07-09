@@ -93,7 +93,6 @@ class GameEngine(private val context: Context) {
 
     private var cachedLaunchAngle = Float.NaN
 
-    private val critText = context.getString(R.string.floating_crit)
     private val plusBallsText = context.getString(R.string.floating_plus_balls)
 
     // Tight spacing between launches; while-loop catches up after frame drops.
@@ -506,7 +505,7 @@ class GameEngine(private val context: Context) {
     fun update(deltaTime: Float): Boolean {
         val dt = (deltaTime * GAME_SPEED).coerceAtMost(0.055f)
         updateActiveBallCount()
-        val heavyLoad = activeBallCount > 40
+        val heavyLoad = activeBallCount > 45
 
         updatePowerUps(dt)
         if (!heavyLoad) {
@@ -592,9 +591,6 @@ class GameEngine(private val context: Context) {
         if (doubleDamageActive) damage *= 2
         if (Random.nextFloat() < upgrades.criticalHitChance()) {
             damage *= 2
-            if (activeBallCount < 45) {
-                addFloatingText(brick.x + brick.width / 2, brick.y, critText)
-            }
         }
         brick.hp -= damage
         score += damage
@@ -615,11 +611,8 @@ class GameEngine(private val context: Context) {
         score += coinAmount * 10
 
         if (playEffects) {
-            if (particleEffectsEnabled && activeBallCount < 50) {
+            if (particleEffectsEnabled && activeBallCount < 40) {
                 particles.emitExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, color)
-            }
-            if (activeBallCount < 35) {
-                addFloatingText(brick.x + brick.width / 2, brick.y, "+${brick.maxHp}")
             }
             if (Random.nextFloat() < 0.04f) {
                 spawnRandomCollectable(brick.x + brick.width / 2, brick.y + brick.height / 2)
