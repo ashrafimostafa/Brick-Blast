@@ -1,0 +1,1 @@
+Coin shop and board color packs; achievements with share; skip-round button; fix brick numbers in late game; smoother rendering.

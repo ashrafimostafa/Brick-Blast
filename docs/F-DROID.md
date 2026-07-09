@@ -17,7 +17,7 @@ This document lists what is already prepared in the repo and the exact steps to 
 | Signed fdroid release APK on GitHub | [Releases](https://github.com/ashrafimostafa/Brick-Blast/releases) (`BrickBlast-<version>-fdroid.apk`) |
 | CI release workflow | [.github/workflows/release.yml](../.github/workflows/release.yml) |
 
-Current release targeted for F-Droid: **v1.3.0** (versionCode **6**).
+Current release targeted for F-Droid: **v1.4.0** (versionCode **7**).
 
 ## 1. Verify the fdroid APK builds locally (optional)
 
@@ -44,15 +44,15 @@ Output APK: `app/build/outputs/apk/fdroid/release/app-fdroid-release.apk`
 If not done yet for the version you want on F-Droid:
 
 ```bash
-git tag -a v1.3.0 -m "v1.3.0"
+git tag -a v1.4.0 -m "v1.4.0"
 git push origin main
-git push origin v1.3.0
+git push origin v1.4.0
 ```
 
 Pushing a `v*.*.*` tag triggers [.github/workflows/release.yml](../.github/workflows/release.yml), which uploads:
 
-- `BrickBlast-1.3.0-fdroid.apk` (FOSS, no ads)
-- `BrickBlast-1.3.0-store.apk` (store build with ads)
+- `BrickBlast-1.4.0-fdroid.apk` (FOSS, no ads)
+- `BrickBlast-1.4.0-store.apk` (store build with ads)
 
 F-Droid uses the **fdroid** APK URL from the `Binaries:` field in metadata for reproducible-build verification.
 
@@ -65,13 +65,13 @@ F-Droid metadata lives in the separate [fdroiddata](https://gitlab.com/fdroid/fd
 1. Fork https://gitlab.com/fdroid/fdroiddata
 2. Copy [metadata/com.mostafa.brickblast.yml](../metadata/com.mostafa.brickblast.yml) into your fork as `metadata/com.mostafa.brickblast.yml`
 3. If this is the **first** submission, open a merge request titled: `New App: Brick Blast`
-4. If the app is **already on F-Droid**, open an update MR with the new `1.3.0` build entry and updated `CurrentVersion` / `CurrentVersionCode`
+4. If the app is **already on F-Droid**, open an update MR with the new `1.4.0` build entry and updated `CurrentVersion` / `CurrentVersionCode`
 
 Checklist for the MR description:
 
 - [ ] App is FOSS (MIT) and builds with `fdroid` flavor only on F-Droid
 - [ ] `SourceCode` and `IssueTracker` URLs are correct
-- [ ] `commit: v1.3.0` tag exists on the default branch
+- [ ] `commit: v1.4.0` tag exists on the default branch
 - [ ] `Binaries` URL matches the GitHub release asset name
 - [ ] `AllowedAPKSigningKeys` matches the developer-signed fdroid APK (for reproducible builds)
 - [ ] Fastlane screenshots and descriptions are in the **app source repo** (F-Droid reads them from upstream)
