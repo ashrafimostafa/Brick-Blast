@@ -48,7 +48,8 @@ data class GameUiState(
     val screenHeight: Float = 1920f,
     val showContinueOffer: Boolean = false,
     val continueAdLoading: Boolean = false,
-    val frame: Long = 0
+    val frame: Long = 0,
+    val coinsEarnedThisRun: Int = 0
 )
 
 @HiltViewModel
@@ -292,8 +293,8 @@ class GameViewModel @Inject constructor(
     fun saveAndQuit() {
         running = false
         viewModelScope.launch {
+            bankSessionCoins()
             autoSave()
-            persistProgress()
             audioManager.stopMusic()
         }
     }
@@ -325,6 +326,7 @@ class GameViewModel @Inject constructor(
         running = false
         gameStarted = false
         if (!isVictory) audioManager.play(SoundEffect.GAME_OVER)
+        val earned = engine.coinsThisSession
         persistProgress()
         highScoreRepository.saveHighScore(engine.score, engine.round, engine.config.mode.name)
         gameSaveRepository.clearSave(engine.config.mode)
@@ -335,14 +337,29 @@ class GameViewModel @Inject constructor(
             it.copy(
                 phase = if (isVictory) GamePhase.VICTORY else GamePhase.GAME_OVER,
                 score = engine.score,
-                round = engine.round
+                round = engine.round,
+                coins = 0,
+                coinsEarnedThisRun = earned
             )
         }
+    }
+
+    private suspend fun bankSessionCoins() {
+        val earned = engine.coinsThisSession.toLong()
+        if (earned <= 0) return
+        playerRepository.addCoins(earned)
+        playerRepository.updateStatistics { stats ->
+            stats.copy(totalCoinsEarned = stats.totalCoinsEarned + earned)
+        }
+        engine.coinsThisSession = 0
+        _uiState.update { it.copy(coins = 0) }
+        checkAchievements()
     }
 
     private suspend fun persistProgress() {
         val earned = engine.coinsThisSession.toLong()
         if (earned > 0) playerRepository.addCoins(earned)
+        engine.coinsThisSession = 0
         playerRepository.updateStatistics { stats ->
             stats.copy(
                 highestRound = maxOf(stats.highestRound, engine.round),

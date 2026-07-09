@@ -14,6 +14,8 @@
     <string name="menu_hardcore">سخت‌گیرانه</string>
     <string name="menu_statistics">آمار</string>
     <string name="menu_achievements">دستاوردها</string>
+    <string name="menu_shop">فروشگاه</string>
+    <string name="menu_coins_balance">🪙 %1$d</string>
     <string name="menu_settings">تنظیمات</string>
 
     <!-- Game modes -->
@@ -68,6 +70,7 @@
     <string name="victory_challenge_subtitle">مرحله %1$d تکمیل شد</string>
     <string name="victory_round_subtitle">دور %1$d تکمیل شد</string>
     <string name="score_label">امتیاز</string>
+    <string name="end_coins_earned">+%1$d سکه کسب شد</string>
     <string name="score_points">امتیاز %1$d</string>
     <string name="mode_label">حالت: %1$s</string>
     <string name="next_level">مرحله بعد</string>
@@ -127,6 +130,7 @@
     <string name="shop_title">فروشگاه</string>
     <string name="shop_your_coins">سکه‌های شما: %1$d</string>
     <string name="shop_subtitle">سکه‌ها را برای ارتقای دائمی خرج کنید</string>
+    <string name="shop_buy_cost">%1$d 🪙</string>
     <string name="upgrade_ball_damage_plus">آسیب توپ +۱</string>
     <string name="upgrade_starting_balls_plus">توپ شروع +۱</string>
     <string name="upgrade_coin_multiplier">ضریب سکه</string>

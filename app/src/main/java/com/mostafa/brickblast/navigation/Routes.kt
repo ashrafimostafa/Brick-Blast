@@ -19,12 +19,14 @@ import kotlinx.serialization.Serializable
     val score: Int,
     val round: Int,
     val mode: String,
-    val challengeLevel: Int = 1
+    val challengeLevel: Int = 1,
+    val coinsEarned: Int = 0
 )
 @Serializable data class VictoryRoute(
     val score: Int,
     val round: Int,
     val mode: String,
-    val challengeLevel: Int = 1
+    val challengeLevel: Int = 1,
+    val coinsEarned: Int = 0
 )
 @Serializable object ChallengeSelectRoute

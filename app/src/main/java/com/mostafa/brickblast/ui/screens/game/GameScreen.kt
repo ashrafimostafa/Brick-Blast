@@ -44,8 +44,8 @@ fun GameScreen(
     challengeLevel: Int,
     continueGame: Boolean,
     onPause: () -> Unit,
-    onGameOver: (Int, Int) -> Unit,
-    onVictory: (Int, Int) -> Unit,
+    onGameOver: (Int, Int, Int) -> Unit,
+    onVictory: (Int, Int, Int) -> Unit,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -79,15 +79,15 @@ fun GameScreen(
         }
     }
 
-    LaunchedEffect(uiState.phase, uiState.showContinueOffer) {
+    LaunchedEffect(uiState.phase, uiState.showContinueOffer, uiState.coinsEarnedThisRun) {
         if (uiState.showContinueOffer) return@LaunchedEffect
         val previous = lastReportedPhase
         lastReportedPhase = uiState.phase
         if (previous == null) return@LaunchedEffect
         if (previous == uiState.phase) return@LaunchedEffect
         when (uiState.phase) {
-            GamePhase.GAME_OVER -> onGameOver(engine.score, engine.round)
-            GamePhase.VICTORY -> onVictory(engine.score, engine.round)
+            GamePhase.GAME_OVER -> onGameOver(engine.score, engine.round, uiState.coinsEarnedThisRun)
+            GamePhase.VICTORY -> onVictory(engine.score, engine.round, uiState.coinsEarnedThisRun)
             else -> {}
         }
     }

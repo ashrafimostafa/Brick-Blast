@@ -12,6 +12,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,6 +40,9 @@ fun ShopScreen(
 ) {
     val coins by viewModel.coins.collectAsState()
     val upgrades by viewModel.upgrades.collectAsState()
+    val coinGold = Color(0xFFFFD600)
+    val ink = MaterialTheme.colorScheme.onBackground
+    val muted = ink.copy(alpha = 0.6f)
 
     Scaffold(
         topBar = {
@@ -56,65 +60,81 @@ fun ShopScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFF0D1B2A))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 stringResource(R.string.shop_your_coins, coins),
-                color = Color(0xFFFFD600),
+                color = coinGold,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 stringResource(R.string.shop_subtitle),
-                color = Color.White.copy(0.6f),
+                color = muted,
                 fontSize = 14.sp
             )
 
             ShopItem(
-                stringResource(R.string.upgrade_ball_damage_plus),
-                stringResource(R.string.upgrade_level, upgrades.ballDamageLevel),
-                upgrades.upgradeCost(UpgradeType.BALL_DAMAGE)
-            ) {
-                viewModel.purchaseUpgrade(UpgradeType.BALL_DAMAGE)
-            }
+                name = stringResource(R.string.upgrade_ball_damage_plus),
+                level = stringResource(R.string.upgrade_level, upgrades.ballDamageLevel),
+                cost = upgrades.upgradeCost(UpgradeType.BALL_DAMAGE),
+                coins = coins,
+                onBuy = { viewModel.purchaseUpgrade(UpgradeType.BALL_DAMAGE) }
+            )
             ShopItem(
-                stringResource(R.string.upgrade_starting_balls_plus),
-                stringResource(R.string.upgrade_level, upgrades.startingBallsLevel),
-                upgrades.upgradeCost(UpgradeType.STARTING_BALLS)
-            ) {
-                viewModel.purchaseUpgrade(UpgradeType.STARTING_BALLS)
-            }
+                name = stringResource(R.string.upgrade_starting_balls_plus),
+                level = stringResource(R.string.upgrade_level, upgrades.startingBallsLevel),
+                cost = upgrades.upgradeCost(UpgradeType.STARTING_BALLS),
+                coins = coins,
+                onBuy = { viewModel.purchaseUpgrade(UpgradeType.STARTING_BALLS) }
+            )
             ShopItem(
-                stringResource(R.string.upgrade_coin_multiplier),
-                stringResource(R.string.upgrade_level, upgrades.coinMultiplierLevel),
-                upgrades.upgradeCost(UpgradeType.COIN_MULTIPLIER)
-            ) {
-                viewModel.purchaseUpgrade(UpgradeType.COIN_MULTIPLIER)
-            }
+                name = stringResource(R.string.upgrade_coin_multiplier),
+                level = stringResource(R.string.upgrade_level, upgrades.coinMultiplierLevel),
+                cost = upgrades.upgradeCost(UpgradeType.COIN_MULTIPLIER),
+                coins = coins,
+                onBuy = { viewModel.purchaseUpgrade(UpgradeType.COIN_MULTIPLIER) }
+            )
             ShopItem(
-                stringResource(R.string.upgrade_critical_hit_chance),
-                stringResource(R.string.upgrade_level, upgrades.criticalHitLevel),
-                upgrades.upgradeCost(UpgradeType.CRITICAL_HIT)
-            ) {
-                viewModel.purchaseUpgrade(UpgradeType.CRITICAL_HIT)
-            }
+                name = stringResource(R.string.upgrade_critical_hit_chance),
+                level = stringResource(R.string.upgrade_level, upgrades.criticalHitLevel),
+                cost = upgrades.upgradeCost(UpgradeType.CRITICAL_HIT),
+                coins = coins,
+                onBuy = { viewModel.purchaseUpgrade(UpgradeType.CRITICAL_HIT) }
+            )
         }
     }
 }
 
 @Composable
-private fun ShopItem(name: String, level: String, cost: Int, onBuy: () -> Unit) {
+private fun ShopItem(
+    name: String,
+    level: String,
+    cost: Int,
+    coins: Long,
+    onBuy: () -> Unit
+) {
+    val ink = MaterialTheme.colorScheme.onBackground
+    val canAfford = coins >= cost
+
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(name, color = Color.White, fontWeight = FontWeight.Medium)
-            Text(level, color = Color.White.copy(0.5f), fontSize = 13.sp)
+            Text(name, color = ink, fontWeight = FontWeight.Medium)
+            Text(level, color = ink.copy(alpha = 0.5f), fontSize = 13.sp)
         }
-        GameButton(text = "$cost", onClick = onBuy, modifier = Modifier.fillMaxWidth(0.35f))
+        GameButton(
+            text = stringResource(R.string.shop_buy_cost, cost),
+            onClick = onBuy,
+            enabled = canAfford,
+            modifier = Modifier.fillMaxWidth(0.38f)
+        )
     }
 }

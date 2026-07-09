@@ -83,6 +83,7 @@ fun GameOverScreen(
     score: Int,
     round: Int,
     mode: String,
+    coinsEarned: Int = 0,
     onRetry: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -92,6 +93,7 @@ fun GameOverScreen(
         score = score,
         roundReached = round,
         mode = mode,
+        coinsEarned = coinsEarned,
         onRetry = onRetry,
         onBack = onBack,
         showShare = true,
@@ -105,6 +107,7 @@ fun VictoryScreen(
     round: Int,
     mode: String,
     challengeLevel: Int = 1,
+    coinsEarned: Int = 0,
     onRetry: () -> Unit,
     onNextLevel: (() -> Unit)? = null,
     onBack: () -> Unit
@@ -122,6 +125,7 @@ fun VictoryScreen(
         score = score,
         roundReached = round,
         mode = mode,
+        coinsEarned = coinsEarned,
         onRetry = onRetry,
         onBack = onBack,
         showShare = false,
@@ -138,6 +142,7 @@ private fun EndGameScreen(
     score: Int,
     roundReached: Int,
     mode: String,
+    coinsEarned: Int,
     onRetry: () -> Unit,
     onBack: () -> Unit,
     showShare: Boolean,
@@ -214,6 +219,15 @@ private fun EndGameScreen(
                 color = muted,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+            if (coinsEarned > 0) {
+                Text(
+                    text = stringResource(R.string.end_coins_earned, coinsEarned),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFFFFD600),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
             Text(
                 text = stringResource(R.string.mode_label, localizedMode),
                 fontSize = 14.sp,

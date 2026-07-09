@@ -54,13 +54,16 @@ fun BrickBlastNavGraph(navController: NavHostController) {
         composable<MainMenuRoute> {
             val vm: MenuViewModel = hiltViewModel()
             val hasSave by vm.hasActiveSave.collectAsState()
+            val coins by vm.coins.collectAsState()
             val scope = rememberCoroutineScope()
             MainMenuScreen(
                 hasActiveSave = hasSave,
+                coins = coins,
                 onPlay = { navController.navigate(GameRoute(mode = "CLASSIC")) },
                 onChallenge = { navController.navigate(ChallengeSelectRoute) },
                 onTimeAttack = { navController.navigate(GameRoute(mode = "TIME_ATTACK")) },
                 onHardcore = { navController.navigate(GameRoute(mode = "HARDCORE")) },
+                onShop = { navController.navigate(ShopRoute) },
                 onSettings = { navController.navigate(SettingsRoute) },
                 onStatistics = { navController.navigate(StatisticsRoute) },
                 onAchievements = { navController.navigate(AchievementsRoute) },
@@ -101,16 +104,16 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 challengeLevel = route.challengeLevel,
                 continueGame = route.continueGame,
                 onPause = { navController.navigate(PauseRoute) },
-                onGameOver = { score, round ->
+                onGameOver = { score, round, coinsEarned ->
                     navController.navigate(
-                        GameOverRoute(score, round, route.mode, route.challengeLevel)
+                        GameOverRoute(score, round, route.mode, route.challengeLevel, coinsEarned)
                     ) {
                         popUpTo<GameRoute> { inclusive = true }
                     }
                 },
-                onVictory = { score, round ->
+                onVictory = { score, round, coinsEarned ->
                     navController.navigate(
-                        VictoryRoute(score, round, route.mode, route.challengeLevel)
+                        VictoryRoute(score, round, route.mode, route.challengeLevel, coinsEarned)
                     ) {
                         popUpTo<GameRoute> { inclusive = true }
                     }
@@ -160,6 +163,7 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 score = route.score,
                 round = route.round,
                 mode = route.mode,
+                coinsEarned = route.coinsEarned,
                 onRetry = {
                     navController.navigate(GameRoute(route.mode, route.challengeLevel)) {
                         popUpTo(MainMenuRoute)
@@ -176,6 +180,7 @@ fun BrickBlastNavGraph(navController: NavHostController) {
                 round = route.round,
                 mode = route.mode,
                 challengeLevel = route.challengeLevel,
+                coinsEarned = route.coinsEarned,
                 onRetry = {
                     navController.navigate(
                         GameRoute(route.mode, route.challengeLevel)

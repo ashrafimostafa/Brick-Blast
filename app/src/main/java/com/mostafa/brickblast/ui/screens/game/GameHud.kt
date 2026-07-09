@@ -76,7 +76,8 @@ fun GameHud(
             Text(
                 stringResource(R.string.hud_coins, coins),
                 fontSize = 15.sp,
-                color = ink.copy(alpha = 0.85f)
+                color = androidx.compose.ui.graphics.Color(0xFFFFD600),
+                fontWeight = FontWeight.Medium
             )
             timeRemaining?.let {
                 Text(

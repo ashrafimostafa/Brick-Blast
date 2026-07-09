@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Coin gamification: shop and wallet balance on main menu, coins earned shown on game over/victory
+- Coins banked when saving and quitting (fixes double-count on continue)
 - Skip to next round button during a shot; balls animate back to the launcher before the next round begins
 - Achievements menu with 54 milestones (rounds up to 1M, bricks, coins, balls, play time, games played)
 - Share unlocked achievements as images
