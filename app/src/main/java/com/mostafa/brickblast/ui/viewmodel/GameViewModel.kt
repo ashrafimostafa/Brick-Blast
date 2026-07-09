@@ -7,6 +7,7 @@ import com.mostafa.brickblast.BuildConfig
 import com.mostafa.brickblast.ads.RewardedAdProvider
 import com.mostafa.brickblast.domain.model.Achievement
 import com.mostafa.brickblast.domain.model.AppSettings
+import com.mostafa.brickblast.domain.model.BoardVisualTheme
 import com.mostafa.brickblast.domain.model.GameConfig
 import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GamePhase
@@ -109,6 +110,7 @@ class GameViewModel @Inject constructor(
             val settings = settingsRepository.settings.first()
             audioManager.setSoundEnabled(settings.soundEnabled)
             audioManager.setMusicEnabled(settings.musicEnabled)
+            engine.boardTheme = BoardVisualTheme.fromPackId(settings.selectedColorPackId)
             if (settings.musicEnabled) audioManager.startMusic()
 
             var save: GameSaveState? = null

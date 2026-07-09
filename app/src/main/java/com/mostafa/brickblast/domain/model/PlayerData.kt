@@ -71,5 +71,7 @@ data class AppSettings(
     val achievementAutoDismiss: Boolean = true,
     val darkTheme: Boolean = true,
     /** null = follow system language; otherwise BCP-47 tag such as "en" or "fa". */
-    val languageTag: String? = null
+    val languageTag: String? = null,
+    val selectedColorPackId: String = ColorPackIds.CLASSIC,
+    val ownedColorPackIds: Set<String> = setOf(ColorPackIds.CLASSIC)
 )

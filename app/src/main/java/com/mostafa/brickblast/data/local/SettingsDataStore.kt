@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.mostafa.brickblast.domain.model.AppSettings
+import com.mostafa.brickblast.domain.model.ColorPackIds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -28,6 +30,8 @@ class SettingsDataStore @Inject constructor(
         val ACHIEVEMENT_AUTO_DISMISS = booleanPreferencesKey("achievement_auto_dismiss")
         val DARK_THEME = booleanPreferencesKey("dark_theme")
         val LANGUAGE_TAG = stringPreferencesKey("language_tag")
+        val SELECTED_COLOR_PACK = stringPreferencesKey("selected_color_pack")
+        val OWNED_COLOR_PACKS = stringSetPreferencesKey("owned_color_packs")
     }
 
     private fun fromPrefs(prefs: Preferences) = AppSettings(
@@ -38,7 +42,9 @@ class SettingsDataStore @Inject constructor(
         particleEffects = prefs[Keys.PARTICLES] ?: true,
         achievementAutoDismiss = prefs[Keys.ACHIEVEMENT_AUTO_DISMISS] ?: true,
         darkTheme = prefs[Keys.DARK_THEME] ?: true,
-        languageTag = prefs[Keys.LANGUAGE_TAG]
+        languageTag = prefs[Keys.LANGUAGE_TAG],
+        selectedColorPackId = prefs[Keys.SELECTED_COLOR_PACK] ?: ColorPackIds.CLASSIC,
+        ownedColorPackIds = prefs[Keys.OWNED_COLOR_PACKS] ?: setOf(ColorPackIds.CLASSIC)
     )
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { prefs -> fromPrefs(prefs) }
@@ -58,6 +64,8 @@ class SettingsDataStore @Inject constructor(
             } else {
                 prefs.remove(Keys.LANGUAGE_TAG)
             }
+            prefs[Keys.SELECTED_COLOR_PACK] = updated.selectedColorPackId
+            prefs[Keys.OWNED_COLOR_PACKS] = updated.ownedColorPackIds
         }
     }
 }

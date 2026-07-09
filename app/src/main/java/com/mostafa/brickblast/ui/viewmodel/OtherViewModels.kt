@@ -7,6 +7,7 @@ import com.mostafa.brickblast.domain.model.PlayerStatistics
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.UpgradeType
 import com.mostafa.brickblast.domain.model.ChallengeProgress
+import com.mostafa.brickblast.domain.model.ColorPackDefinitions
 import com.mostafa.brickblast.domain.model.GameSaveState
 import com.mostafa.brickblast.domain.repository.ChallengeRepository
 import com.mostafa.brickblast.domain.repository.GameSaveRepository
@@ -16,9 +17,13 @@ import com.mostafa.brickblast.domain.repository.SettingsRepository
 import com.mostafa.brickblast.game.audio.AudioManager
 import com.mostafa.brickblast.ui.util.LocaleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 @HiltViewModel
@@ -142,14 +147,55 @@ class AchievementsViewModel @Inject constructor(
 
 @HiltViewModel
 class ShopViewModel @Inject constructor(
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     val coins = playerRepository.coins
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
     val upgrades = playerRepository.upgrades
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PlayerUpgrades())
+    val settings = settingsRepository.settings
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppSettings())
+
+    private val _easterEggUnlocked = MutableStateFlow(false)
+    val easterEggUnlocked = _easterEggUnlocked.asStateFlow()
 
     fun purchaseUpgrade(type: UpgradeType) {
         viewModelScope.launch { playerRepository.upgrade(type) }
+    }
+
+    fun purchaseColorPack(packId: String) {
+        viewModelScope.launch {
+            val pack = ColorPackDefinitions.byId(packId) ?: return@launch
+            val current = settingsRepository.settings.first()
+            if (packId in current.ownedColorPackIds || pack.price <= 0) return@launch
+            if (!playerRepository.spendCoins(pack.price.toLong())) return@launch
+            settingsRepository.updateSettings {
+                it.copy(ownedColorPackIds = it.ownedColorPackIds + packId)
+            }
+        }
+    }
+
+    fun equipColorPack(packId: String) {
+        viewModelScope.launch {
+            val current = settingsRepository.settings.first()
+            val owned = packId in current.ownedColorPackIds ||
+                (ColorPackDefinitions.byId(packId)?.price ?: 0) <= 0
+            if (!owned) return@launch
+            settingsRepository.updateSettings { it.copy(selectedColorPackId = packId) }
+        }
+    }
+
+    /** Hidden: tap "Board Color Packs" title 7 times in the shop. */
+    fun unlockAllColorPacksEasterEgg() {
+        viewModelScope.launch {
+            val allIds = ColorPackDefinitions.ALL.map { it.id }.toSet()
+            settingsRepository.updateSettings {
+                it.copy(ownedColorPackIds = allIds)
+            }
+            _easterEggUnlocked.value = true
+            delay(2500)
+            _easterEggUnlocked.value = false
+        }
     }
 }

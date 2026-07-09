@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.Choreographer
 import android.view.MotionEvent
 import android.view.View
+import com.mostafa.brickblast.domain.model.BoardVisualTheme
 import com.mostafa.brickblast.game.renderer.NativeGameRenderer
 import com.mostafa.brickblast.ui.viewmodel.GameViewModel
 
@@ -17,6 +18,7 @@ class GameCanvasView(context: Context) : View(context) {
     var viewModel: GameViewModel? = null
     var showTrajectory: Boolean = true
     var isDarkTheme: Boolean = true
+    var boardTheme: BoardVisualTheme = BoardVisualTheme.Classic
     var persianUi: Boolean = false
     var onCanvasSizeChanged: ((Int, Int) -> Unit)? = null
 
@@ -74,6 +76,7 @@ class GameCanvasView(context: Context) : View(context) {
             engine = engine,
             trajectoryPoints = engine.getTrajectoryPoints(),
             showTrajectory = showTrajectory,
+            theme = boardTheme,
             isDark = isDarkTheme,
             persianUi = persianUi
         )

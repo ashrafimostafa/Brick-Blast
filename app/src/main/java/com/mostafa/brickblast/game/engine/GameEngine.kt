@@ -12,6 +12,7 @@ import com.mostafa.brickblast.domain.model.GameMode
 import com.mostafa.brickblast.domain.model.GamePhase
 import com.mostafa.brickblast.data.local.GameStateSerializer
 import com.mostafa.brickblast.domain.model.GameSaveState
+import com.mostafa.brickblast.domain.model.BoardVisualTheme
 import com.mostafa.brickblast.domain.model.PlayerUpgrades
 import com.mostafa.brickblast.domain.model.PowerUpType
 import com.mostafa.brickblast.game.particle.ParticleSystem
@@ -48,6 +49,7 @@ class GameEngine(private val context: Context) {
     var ballsLaunchedTotal = 0L
     var config = GameConfig()
     var upgrades = PlayerUpgrades()
+    var boardTheme: BoardVisualTheme = BoardVisualTheme.Classic
     var coinMultiplier: Float = 1f
 
     var aimStartX = 0f
@@ -606,7 +608,7 @@ class GameEngine(private val context: Context) {
     private fun handleBrickDestroyed(brick: Brick, playEffects: Boolean = true) {
         bricksDestroyedThisRound++
         bricksDestroyedTotal++
-        val color = brickColorForHp(brick.maxHp)
+        val color = boardTheme.brickColorForHp(brick.maxHp)
 
         val coinAmount = ((1 + round / 10f) * coinMultiplier).roundToInt().coerceAtLeast(1)
         coinsThisSession += coinAmount
@@ -961,25 +963,5 @@ class GameEngine(private val context: Context) {
         /** Slightly faster pacing for balls, launches, animations, and timers. */
         private const val GAME_SPEED = 1.1f
         private val EMPTY_TRAJECTORY = FloatArray(0)
-        private val BRICK_COLORS: Array<androidx.compose.ui.graphics.Color> = Array(51) { hp ->
-            val ratio = (hp.coerceAtMost(50) / 50f)
-            val r = (255 * ratio).toInt().coerceIn(50, 255)
-            val g = (200 * (1 - ratio)).toInt().coerceIn(50, 200)
-            val b = (100 + 155 * (1 - ratio)).toInt().coerceIn(50, 255)
-            androidx.compose.ui.graphics.Color(r, g, b)
-        }
-
-        fun brickColorForHp(hp: Int): androidx.compose.ui.graphics.Color =
-            BRICK_COLORS[hp.coerceIn(1, 50)]
-
-        fun brickColorIntForHp(hp: Int): Int = BRICK_COLOR_INTS[hp.coerceIn(1, 50)]
-
-        private val BRICK_COLOR_INTS: IntArray = IntArray(51) { hp ->
-            val ratio = (hp.coerceAtMost(50) / 50f)
-            val r = (255 * ratio).toInt().coerceIn(50, 255)
-            val g = (200 * (1 - ratio)).toInt().coerceIn(50, 200)
-            val b = (100 + 155 * (1 - ratio)).toInt().coerceIn(50, 255)
-            android.graphics.Color.rgb(r, g, b)
-        }
     }
 }
