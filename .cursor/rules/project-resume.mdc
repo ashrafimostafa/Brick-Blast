@@ -1,0 +1,47 @@
+---
+description: Brick Blast project state — read when resuming work after a break
+alwaysApply: true
+---
+
+# Brick Blast — resume context
+
+**Path:** `/home/mostafa/AndroidStudioProjects/SwipeBrickBreaker`  
+**Package:** `com.mostafa.brickblast`  
+**Branch:** `main` (keep clean before switching away)  
+**Release:** v1.4.0 (versionCode 7), tag `v1.4.0`  
+**Remote:** `git@github.com:ashrafimostafa/Brick-Blast.git`
+
+## How to reopen
+
+1. **File → Open Folder** → `SwipeBrickBreaker`
+2. Chat history for this folder is kept in Cursor when you return
+3. Run `git status` and `git pull` before continuing
+
+## What shipped in v1.4.0
+
+- Coin shop + wallet on main menu; coins on game over/victory; bank on save-quit
+- Board color packs (6 themes, Block World voxel, animated premium FX)
+- Achievements (54 milestones, share, popup polish)
+- Skip-round with ball recall
+- Late-game fix: brick HP always visible, rounded corners, perf tuning (no CRIT popup)
+
+## Key areas
+
+| Feature | Files |
+|---------|--------|
+| Color packs | `domain/model/ColorPack.kt`, `NativeGameRenderer.kt`, `ShopScreen.kt` |
+| Coins | `GameViewModel.kt`, `PlayerRepository`, `ShopViewModel` |
+| F-Droid | `metadata/com.mostafa.brickblast.yml`, `docs/F-DROID.md`, `fdroid` flavor |
+| Changelog | `CHANGELOG.md`, `fastlane/.../changelogs/7.txt` |
+
+## Local conventions
+
+- Use **Myket mirror first** in Gradle (see `myket-gradle-mirror.mdc`); F-Droid prebuild strips it
+- Do **not** commit unless asked
+- Easter egg: tap Shop “Board Color Packs” title 7× — not in changelog
+
+## Likely next steps (when user returns)
+
+- F-Droid fdroiddata MR for 1.4.0 if not merged
+- Push any local commits after `v1.4.0` tag if not on GitHub
+- New features per user request
