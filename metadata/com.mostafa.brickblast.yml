@@ -16,7 +16,7 @@ Binaries:
 Builds:
   - versionName: 1.5.0
     versionCode: 8
-    commit: v1.5.0
+    commit: 8db205f1cb5cb6437b0d5e714f586f8ba985193c
     subdir: app
     gradle:
       - fdroid
