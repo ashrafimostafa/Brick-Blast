@@ -140,7 +140,13 @@ class NativeGameRenderer(context: Context, density: Float) {
     private var cachedIdleBalls = -1
     private var cachedIdleLabel = ""
     private var cachedPersianUi = false
-    private val hpLabelCache = Array(101) { if (it == 0) "" else it.toString() }
+    /** Covers typical late-game HP; values above fall back to toString(). */
+    private val hpLabelCache = Array(HP_LABEL_CACHE_SIZE) { if (it == 0) "" else it.toString() }
+
+    private fun hpLabel(hp: Int): String {
+        val value = hp.coerceAtLeast(0)
+        return if (value < HP_LABEL_CACHE_SIZE) hpLabelCache[value] else value.toString()
+    }
 
     fun render(
         canvas: Canvas,
@@ -282,13 +288,12 @@ class NativeGameRenderer(context: Context, density: Float) {
             }
 
             val textY = cy - (hpTextPaint.descent() + hpTextPaint.ascent()) * 0.5f
-            val hpLabel = hpLabelCache[brick.hp.coerceIn(0, 100)]
             if (blockyBricks) {
                 hpTextPaint.color = if (brick.hp >= 22) Color.WHITE else Color.parseColor("#3E2723")
             } else {
                 hpTextPaint.color = Color.WHITE
             }
-            canvas.drawText(hpLabel, cx, textY, hpTextPaint)
+            canvas.drawText(hpLabel(brick.hp), cx, textY, hpTextPaint)
         }
 
         for (c in engine.collectables) {
@@ -788,6 +793,7 @@ class NativeGameRenderer(context: Context, density: Float) {
     }
 
     companion object {
+        private const val HP_LABEL_CACHE_SIZE = 1001
         private val COLLECT_BALL_PAINT = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#00E5FF") }
         private val COIN_PAINT = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#FFD600") }
         private val POWER_MULTI_PAINT = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#00E676") }
