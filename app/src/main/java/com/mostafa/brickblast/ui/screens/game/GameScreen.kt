@@ -207,7 +207,6 @@ private fun GameWorldCanvas(
             view.viewModel = viewModel
             view.showTrajectory = showTrajectory
             view.isDarkTheme = isDarkTheme
-            view.boardTheme = viewModel.gameEngine.boardTheme
             view.persianUi = persianUi
             view.onCanvasSizeChanged = { w, h -> onCanvasSizeChanged(IntSize(w, h)) }
             view.contentDescription = boardDescription
