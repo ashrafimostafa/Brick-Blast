@@ -88,6 +88,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun toggleRichExplosions(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateSettings { it.copy(richExplosions = enabled) }
+        }
+    }
+
     fun toggleAchievementAutoDismiss(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateSettings { it.copy(achievementAutoDismiss = enabled) }

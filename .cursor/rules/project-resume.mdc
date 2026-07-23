@@ -8,7 +8,7 @@ alwaysApply: true
 **Path:** `/home/mostafa/AndroidStudioProjects/SwipeBrickBreaker`  
 **Package:** `com.mostafa.brickblast`  
 **Branch:** `main` (keep clean before switching away)  
-**Release:** v1.4.0 (versionCode 7), tag `v1.4.0`  
+**Release:** v1.5.0 (versionCode 8), tag `v1.5.0`  
 **Remote:** `git@github.com:ashrafimostafa/Brick-Blast.git`
 
 ## How to reopen
@@ -17,22 +17,22 @@ alwaysApply: true
 2. Chat history for this folder is kept in Cursor when you return
 3. Run `git status` and `git pull` before continuing
 
-## What shipped in v1.4.0
+## What shipped in v1.5.0
 
-- Coin shop + wallet on main menu; coins on game over/victory; bank on save-quit
-- Board color packs (6 themes, Block World voxel, animated premium FX)
-- Achievements (54 milestones, share, popup polish)
-- Skip-round with ball recall
-- Late-game fix: brick HP always visible, rounded corners, perf tuning (no CRIT popup)
+- Punchier SFX: machine-gun ball launch + Crack/Blam/Pop destroy variants
+- Rich brick smash particles (3 styles); Settings → Rich Explosions toggle
+- Fixes: brick HP >100, color pack on first game, skip FAB above nav, bricks vs launcher
 
 ## Key areas
 
 | Feature | Files |
 |---------|--------|
+| Audio / SFX | `game/audio/AudioManager.kt`, `GameViewModel.kt` |
+| Explosions | `game/particle/ParticleSystem.kt`, `GameEngine.kt`, Settings |
 | Color packs | `domain/model/ColorPack.kt`, `NativeGameRenderer.kt`, `ShopScreen.kt` |
 | Coins | `GameViewModel.kt`, `PlayerRepository`, `ShopViewModel` |
 | F-Droid | `metadata/com.mostafa.brickblast.yml`, `docs/F-DROID.md`, `fdroid` flavor |
-| Changelog | `CHANGELOG.md`, `fastlane/.../changelogs/7.txt` |
+| Changelog | `CHANGELOG.md`, `fastlane/.../changelogs/8.txt` |
 
 ## Local conventions
 
@@ -42,6 +42,6 @@ alwaysApply: true
 
 ## Likely next steps (when user returns)
 
-- F-Droid fdroiddata MR for 1.4.0 if not merged
-- Push any local commits after `v1.4.0` tag if not on GitHub
+- Tag `v1.5.0`, push main + tag for GitHub release CI
+- F-Droid fdroiddata MR for 1.5.0 if not merged
 - New features per user request

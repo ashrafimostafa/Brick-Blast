@@ -68,6 +68,7 @@ data class AppSettings(
     val vibrationEnabled: Boolean = true,
     val showTrajectory: Boolean = true,
     val particleEffects: Boolean = true,
+    val richExplosions: Boolean = true,
     val achievementAutoDismiss: Boolean = true,
     val darkTheme: Boolean = true,
     /** null = follow system language; otherwise BCP-47 tag such as "en" or "fa". */

@@ -26,9 +26,10 @@ import kotlin.random.Random
 class GameEngine(private val context: Context) {
 
     val physics = PhysicsEngine()
-    val particles = ParticleSystem(256)
+    val particles = ParticleSystem(512)
 
     var particleEffectsEnabled = true
+    var richExplosionsEnabled = true
 
     val bricks = ArrayList<Brick>(64)
     val balls = ArrayList<Ball>(32)
@@ -116,6 +117,7 @@ class GameEngine(private val context: Context) {
     var onBallBounce: (() -> Unit)? = null
     var onCollect: ((Collectable) -> Unit)? = null
     var onShoot: (() -> Unit)? = null
+    var onBallLaunched: (() -> Unit)? = null
     var onGameOver: (() -> Unit)? = null
     var onRoundComplete: ((Int) -> Unit)? = null
     var onPowerUpActivated: ((PowerUpType) -> Unit)? = null
@@ -542,6 +544,7 @@ class GameEngine(private val context: Context) {
                     ballsLaunchedTotal++
                     launchQueueIndex++
                     unlaunchedBallCount = balls.size - launchQueueIndex
+                    onBallLaunched?.invoke()
                 }
                 if (launchQueueIndex >= balls.size) {
                     phase = GamePhase.SIMULATING
@@ -616,7 +619,12 @@ class GameEngine(private val context: Context) {
 
         if (playEffects) {
             if (particleEffectsEnabled && activeBallCount < 40) {
-                particles.emitExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, color)
+                particles.emitBrickSmash(
+                    brick.x + brick.width / 2,
+                    brick.y + brick.height / 2,
+                    color,
+                    rich = richExplosionsEnabled
+                )
             }
             if (Random.nextFloat() < 0.04f) {
                 spawnRandomCollectable(brick.x + brick.width / 2, brick.y + brick.height / 2)
@@ -687,7 +695,12 @@ class GameEngine(private val context: Context) {
         if (destroyed > 0) {
             markBricksChanged()
             if (particleEffectsEnabled) {
-                particles.emitExplosion(x, y, androidx.compose.ui.graphics.Color(0xFFFF5722), 10)
+                particles.emitBrickSmash(
+                    x,
+                    y,
+                    androidx.compose.ui.graphics.Color(0xFFFF5722),
+                    rich = richExplosionsEnabled
+                )
             }
             sample?.let { onBrickDestroyed?.invoke(it) }
         }
@@ -713,11 +726,11 @@ class GameEngine(private val context: Context) {
         if (destroyed > 0) {
             markBricksChanged()
             if (particleEffectsEnabled) {
-                particles.emitExplosion(
+                particles.emitBrickSmash(
                     targetX + brickWidth / 2f,
                     effectY,
                     androidx.compose.ui.graphics.Color(0xFFE040FB),
-                    10
+                    rich = richExplosionsEnabled
                 )
             }
             sample?.let { onBrickDestroyed?.invoke(it) }

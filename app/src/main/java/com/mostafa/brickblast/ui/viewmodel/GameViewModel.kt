@@ -76,6 +76,8 @@ class GameViewModel @Inject constructor(
     private var gameEndHandled = false
     private var totalCoins = 0L
     private var lastBounceSoundMs = 0L
+    private var lastLaunchSoundMs = 0L
+    private var lastDestroySoundMs = 0L
     private var lastHudUpdateNanos = 0L
     private var continueUsedThisGame = false
 
@@ -133,9 +135,9 @@ class GameViewModel @Inject constructor(
 
             engine.onBrickDestroyed = {
                 val now = System.currentTimeMillis()
-                if (now - lastBounceSoundMs > 60L) {
+                if (now - lastDestroySoundMs > 35L) {
                     audioManager.play(SoundEffect.DESTROY)
-                    lastBounceSoundMs = now
+                    lastDestroySoundMs = now
                 }
             }
             engine.onBallBounce = {
@@ -147,6 +149,14 @@ class GameViewModel @Inject constructor(
             }
             engine.onCollect = { audioManager.play(SoundEffect.COLLECT) }
             engine.onShoot = { audioManager.play(SoundEffect.SHOOT) }
+            engine.onBallLaunched = {
+                val now = System.currentTimeMillis()
+                // Short gap so rapid launches read as a machine-gun "thrthrthr".
+                if (now - lastLaunchSoundMs > 18L) {
+                    audioManager.play(SoundEffect.BALL_LAUNCH)
+                    lastLaunchSoundMs = now
+                }
+            }
             engine.onGameOver = { /* handled in tick() — may show continue-offer first */ }
             engine.onRoundComplete = { r ->
                 viewModelScope.launch {
@@ -160,6 +170,7 @@ class GameViewModel @Inject constructor(
             val h = _uiState.value.screenHeight
             engine.initGame(w, h, config, upgrades, save)
             engine.particleEffectsEnabled = settings.particleEffects
+            engine.richExplosionsEnabled = settings.richExplosions
 
             _uiState.update {
                 it.copy(

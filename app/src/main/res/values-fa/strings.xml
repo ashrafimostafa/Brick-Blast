@@ -45,6 +45,7 @@
     <string name="settings_vibration">لرزش</string>
     <string name="settings_trajectory_preview">پیش‌نمایش مسیر</string>
     <string name="settings_particle_effects">جلوه‌های ذره‌ای</string>
+    <string name="settings_rich_explosions">انفجارهای پر جزئیات</string>
     <string name="settings_achievement_auto_dismiss">بستن خودکار پنجره دستاورد</string>
 
     <!-- Game HUD -->

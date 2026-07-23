@@ -1,0 +1,1 @@
+Punchier launch and destroy sounds; richer brick explosions (toggle in Settings); fixes for brick HP, color packs, skip button, and late-game brick advance.

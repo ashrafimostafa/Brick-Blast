@@ -72,7 +72,7 @@ This project is prepared for [F-Droid](https://f-droid.org/) submission:
 - **Store listing:** [fastlane/metadata/android/en-US/](fastlane/metadata/android/en-US/)
 - **Screenshots:** [fastlane/metadata/android/en-US/images/phoneScreenshots/](fastlane/metadata/android/en-US/images/phoneScreenshots/)
 
-Current F-Droid target: **v1.4.0** (versionCode 7). Signed fdroid APK: [GitHub Releases](https://github.com/ashrafimostafa/Brick-Blast/releases).
+Current F-Droid target: **v1.5.0** (versionCode 8). Signed fdroid APK: [GitHub Releases](https://github.com/ashrafimostafa/Brick-Blast/releases).
 
 
 ## Project structure

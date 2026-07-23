@@ -45,6 +45,7 @@
     <string name="settings_vibration">Vibration</string>
     <string name="settings_trajectory_preview">Trajectory Preview</string>
     <string name="settings_particle_effects">Particle Effects</string>
+    <string name="settings_rich_explosions">Rich Explosions</string>
     <string name="settings_achievement_auto_dismiss">Auto-close achievement popup</string>
 
     <!-- Game HUD -->

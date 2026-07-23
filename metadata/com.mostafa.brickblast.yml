@@ -14,6 +14,17 @@ Binaries:
   https://github.com/ashrafimostafa/Brick-Blast/releases/download/v%v/BrickBlast-%v-fdroid.apk
 
 Builds:
+  - versionName: 1.5.0
+    versionCode: 8
+    commit: v1.5.0
+    subdir: app
+    gradle:
+      - fdroid
+    prebuild:
+      - sed -i -e '/maven.myket.ir/d' ../settings.gradle.kts
+      - sed -i -e 's@maven.myket.ir/gradle/distributions@services.gradle.org/distributions@'
+        ../gradle/wrapper/gradle-wrapper.properties
+
   - versionName: 1.4.0
     versionCode: 7
     commit: d404eff42968164ddb2e90e2da7c7216703c2cf1
@@ -40,5 +51,5 @@ AllowedAPKSigningKeys: c8075d7ffe193cc213bc38404816bb8dacf247f4c0e3e23e8a400d84f
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.4.0
-CurrentVersionCode: 7
+CurrentVersion: 1.5.0
+CurrentVersionCode: 8
