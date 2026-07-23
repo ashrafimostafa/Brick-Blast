@@ -195,7 +195,8 @@ class GameEngine(private val context: Context) {
             timeAttackRemaining = gameConfig.timeLimitSeconds.toFloat()
 
             if (gameConfig.mode == GameMode.CHALLENGE) {
-                val rows = (2 + gameConfig.challengeLevel / 12).coerceIn(2, 12)
+                val rows = (2 + gameConfig.challengeLevel / 12)
+                    .coerceIn(2, maxSafeBrickRows())
                 repeat(rows) {
                     moveBricksDown()
                     spawnTopRow()
@@ -203,12 +204,15 @@ class GameEngine(private val context: Context) {
             } else if ((save?.round ?: 1) <= 1) {
                 spawnInitialBricks()
             } else {
-                repeat(minOf(save?.round ?: 1, 5)) {
+                repeat(minOf(save?.round ?: 1, 5, maxSafeBrickRows())) {
                     moveBricksDown()
                     spawnTopRow()
                 }
             }
         }
+
+        // Saves from older builds may still have bricks behind the launcher.
+        cullBricksPastLoseLine()
 
         launcherAnimating = false
         launcherAnimT = 1f
@@ -721,27 +725,7 @@ class GameEngine(private val context: Context) {
     }
 
     private fun endRound() {
-        val loseMargin = if (config.mode == GameMode.CLASSIC) {
-            brickHeight.coerceAtLeast(32f) * 0.35f
-        } else {
-            brickHeight.coerceAtLeast(32f)
-        }
-        val loseLine = bounds.bottom - loseMargin
-        // Check game over - bricks encroaching on the launcher zone
-        for (brick in bricks) {
-            if (brick.hp > 0 && brick.y + brick.height >= loseLine) {
-                if (config.mode == GameMode.HARDCORE) {
-                    phase = GamePhase.GAME_OVER
-                    onGameOver?.invoke()
-                    return
-                }
-                phase = GamePhase.GAME_OVER
-                onGameOver?.invoke()
-                return
-            }
-        }
-
-        // Challenge mode victory check
+        // Challenge mode victory check (before advancing the board).
         if (config.mode == GameMode.CHALLENGE && bricks.none { it.hp > 0 }) {
             phase = GamePhase.VICTORY
             return
@@ -749,11 +733,16 @@ class GameEngine(private val context: Context) {
 
         phase = GamePhase.ROUND_END
         moveBricksDown()
+        // Must check AFTER the advance — otherwise bricks can sit on/behind the
+        // launcher for a full aiming turn and become unreachable.
+        if (checkAndHandleGameOver()) return
+
         round++
         spawnTopRow()
         // Classic: occasional extra row pressure (less frequent than before).
         if (config.mode == GameMode.CLASSIC && round % 8 == 0) {
             moveBricksDown()
+            if (checkAndHandleGameOver()) return
             spawnTopRow()
         }
         coinsThisSession += (5 + round / 2)
@@ -774,6 +763,39 @@ class GameEngine(private val context: Context) {
         resetBallsForAim()
         phase = GamePhase.AIMING
         onRoundComplete?.invoke(round)
+    }
+
+    /** Bricks may not enter the launcher's vertical space. */
+    private fun loseLineY(): Float =
+        launcherY - brickHeight.coerceAtLeast(32f) * 0.2f
+
+    private fun maxSafeBrickRows(): Int {
+        val step = brickHeight + BRICK_GAP
+        if (step <= 0f) return 1
+        val usable = loseLineY() - bounds.brickAreaTop
+        return (usable / step).toInt().coerceAtLeast(1)
+    }
+
+    private fun bricksReachedLoseLine(): Boolean {
+        val line = loseLineY()
+        return bricks.any { brick ->
+            brick.hp > 0 && !brick.isDestroying && brick.y + brick.height >= line
+        }
+    }
+
+    private fun checkAndHandleGameOver(): Boolean {
+        if (!bricksReachedLoseLine()) return false
+        phase = GamePhase.GAME_OVER
+        onGameOver?.invoke()
+        return true
+    }
+
+    private fun cullBricksPastLoseLine() {
+        val line = loseLineY()
+        val removed = bricks.removeAll { brick ->
+            brick.hp > 0 && brick.y + brick.height >= line
+        }
+        if (removed) markBricksChanged()
     }
 
     /**
