@@ -5,34 +5,32 @@ alwaysApply: true
 
 # Brick Blast — resume context
 
-**Path:** `/home/mostafa/AndroidStudioProjects/SwipeBrickBreaker`  
+**Path:** `/home/mostafa/AndroidStudioProjects/BrickBlast`  
 **Package:** `com.mostafa.brickblast`  
 **Branch:** `main` (keep clean before switching away)  
-**Release:** v1.5.0 (versionCode 8), tag `v1.5.0`  
+**Release:** v1.5.1 (versionCode 9), tag `v1.5.1`  
 **Remote:** `git@github.com:ashrafimostafa/Brick-Blast.git`
 
 ## How to reopen
 
-1. **File → Open Folder** → `SwipeBrickBreaker`
+1. **File → Open Folder** → `BrickBlast`
 2. Chat history for this folder is kept in Cursor when you return
 3. Run `git status` and `git pull` before continuing
 
-## What shipped in v1.5.0
+## What shipped in v1.5.1
 
-- Punchier SFX: machine-gun ball launch + Crack/Blam/Pop destroy variants
-- Rich brick smash particles (3 styles); Settings → Rich Explosions toggle
-- Fixes: brick HP >100, color pack on first game, skip FAB above nav, bricks vs launcher
+- Fix pause buffering / challenge bypass (issue #7)
+- Updated app / F-Droid icon
 
 ## Key areas
 
 | Feature | Files |
 |---------|--------|
+| Pause / round advance | `GameEngine.kt`, `GameViewModel.kt`, `NavGraph.kt` |
 | Audio / SFX | `game/audio/AudioManager.kt`, `GameViewModel.kt` |
 | Explosions | `game/particle/ParticleSystem.kt`, `GameEngine.kt`, Settings |
-| Color packs | `domain/model/ColorPack.kt`, `NativeGameRenderer.kt`, `ShopScreen.kt` |
-| Coins | `GameViewModel.kt`, `PlayerRepository`, `ShopViewModel` |
 | F-Droid | `metadata/com.mostafa.brickblast.yml`, `docs/F-DROID.md`, `fdroid` flavor |
-| Changelog | `CHANGELOG.md`, `fastlane/.../changelogs/8.txt` |
+| Changelog | `CHANGELOG.md`, `fastlane/.../changelogs/9.txt` |
 
 ## Local conventions
 
@@ -42,6 +40,6 @@ alwaysApply: true
 
 ## Likely next steps (when user returns)
 
-- Tag `v1.5.0`, push main + tag for GitHub release CI
-- F-Droid fdroiddata MR for 1.5.0 if not merged
+- Commit 1.5.1 prep, tag `v1.5.1`, push main + tag for GitHub release CI
+- F-Droid fdroiddata MR for 1.5.1 if not merged
 - New features per user request
