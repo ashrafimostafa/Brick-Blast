@@ -294,17 +294,24 @@ class GameViewModel @Inject constructor(
     fun pause() {
         running = false
         engine.pause()
-        viewModelScope.launch { autoSave() }
+        _uiState.update { it.copy(phase = engine.phase, isAiming = engine.isAiming) }
+        // Mid-shot pause must not autosave — restore would start AIMING with
+        // damaged bricks and no board advance (same exploit as issue #7).
+        if (engine.canSafelyAutoSave()) {
+            viewModelScope.launch { autoSave() }
+        }
     }
 
     fun resume() {
         if (!gameStarted) return
         engine.resume()
         running = true
+        _uiState.update { it.copy(phase = engine.phase, isAiming = engine.isAiming) }
     }
 
     fun saveAndQuit() {
         running = false
+        engine.settleInterruptedShotForSave()
         viewModelScope.launch {
             bankSessionCoins()
             autoSave()

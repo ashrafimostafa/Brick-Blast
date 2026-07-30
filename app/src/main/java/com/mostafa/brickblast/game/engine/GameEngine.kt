@@ -224,6 +224,7 @@ class GameEngine(private val context: Context) {
         resetBallsForAim()
         markBricksChanged()
         phase = GamePhase.AIMING
+        phaseBeforePause = GamePhase.AIMING
     }
 
     fun setNextBrickId(id: Long) {
@@ -965,17 +966,51 @@ class GameEngine(private val context: Context) {
         return cachedTrajectory
     }
 
+    private var phaseBeforePause: GamePhase = GamePhase.AIMING
+
     fun pause() {
-        if (phase != GamePhase.GAME_OVER && phase != GamePhase.VICTORY) {
-            phase = GamePhase.PAUSED
-            physics.timeScale = 1f
+        if (phase == GamePhase.PAUSED ||
+            phase == GamePhase.GAME_OVER ||
+            phase == GamePhase.VICTORY
+        ) {
+            return
         }
+        // Remember the real phase so resume does not jump back to AIMING
+        // mid-shot (that skipped moveBricksDown / endRound — issue #7).
+        phaseBeforePause = phase
+        phase = GamePhase.PAUSED
+        physics.timeScale = 1f
     }
 
     fun resume() {
-        if (phase == GamePhase.PAUSED) {
-            phase = GamePhase.AIMING
-            physics.timeScale = 1f
+        if (phase != GamePhase.PAUSED) return
+        phase = phaseBeforePause
+        physics.timeScale = 1f
+    }
+
+    /** True when saving now would not soft-lock an in-flight shot as a free re-aim. */
+    fun canSafelyAutoSave(): Boolean =
+        phase == GamePhase.AIMING ||
+            (phase == GamePhase.PAUSED && phaseBeforePause == GamePhase.AIMING)
+
+    /**
+     * If paused (or still running) during a shot, finish the round so save/quit
+     * cannot keep brick damage without lowering the board.
+     */
+    fun settleInterruptedShotForSave() {
+        val effective = if (phase == GamePhase.PAUSED) phaseBeforePause else phase
+        when (effective) {
+            GamePhase.LAUNCHING, GamePhase.SIMULATING, GamePhase.RECALLING -> {
+                // Leave PAUSED so finishCanceledRound → endRound can run fully.
+                phase = effective
+                finishCanceledRound()
+            }
+            else -> {
+                if (phase == GamePhase.PAUSED) {
+                    phase = GamePhase.AIMING
+                    phaseBeforePause = GamePhase.AIMING
+                }
+            }
         }
     }
 

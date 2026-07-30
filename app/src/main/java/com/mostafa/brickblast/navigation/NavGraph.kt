@@ -126,7 +126,10 @@ fun BrickBlastNavGraph(navController: NavHostController) {
             val parentEntry = navController.previousBackStackEntry
             val vm: GameViewModel = if (parentEntry != null) hiltViewModel(parentEntry) else hiltViewModel()
             PauseScreen(
-                onResume = { navController.popBackStack() },
+                onResume = {
+                    vm.resume()
+                    navController.popBackStack()
+                },
                 onQuit = {
                     vm.saveAndQuit()
                     navController.popBackStack(MainMenuRoute, inclusive = false)
