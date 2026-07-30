@@ -70,10 +70,30 @@ jobs:
           name: release-apk
           path: artifacts/*.apk
 
+      - name: Extract release notes for this version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          # Manual runs on a branch: use versionName from Gradle.
+          if [[ "$TAG" != v*.*.* ]]; then
+            VERSION=$(sed -n 's/.*versionName = "\([^"]*\)"/\1/p' app/build.gradle.kts | head -1)
+            TAG="v${VERSION}"
+          fi
+          awk -v tag="$TAG" '
+            $0 == "## " tag { found = 1; print; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::No CHANGELOG.md section for ${TAG}"
+            exit 1
+          fi
+          echo "Release notes for ${TAG}:"
+          cat release-notes.md
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/*.apk
-          body_path: CHANGELOG.md
+          body_path: release-notes.md
           draft: false
           prerelease: false
